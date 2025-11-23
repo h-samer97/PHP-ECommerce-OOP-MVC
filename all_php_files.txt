@@ -1,0 +1,2415 @@
+==================================================
+=== FILE: ./Views/Pages/404.php
+==================================================
+<?php
+
+use Core\Helper\URL;
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+echo (new Head('404', '404'))->Render(); ?>
+
+<img src="<?php echo URL::ico('404') ?>" alt="error404" class="E404">
+
+<?php echo (new Footer('script', 'echarts.min'))->Render(); ?>
+
+
+==================================================
+=== FILE: ./Views/Pages/Members.php
+==================================================
+
+  <form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/update'; ?>">
+    <h2><i class="fa fa-user-edit"></i> Edit Member</h2>
+
+    <div class="form-group">
+      <label for="username" class="required">Username</label>
+      <input type="hidden" name="userid" value="<?php echo $userRecord->userID ?>">
+      <input type="text" id="username" placeholder="Enter username" name="username" value="<?php echo $userRecord->username ?>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" value="" name="newPassword">
+      <input type="hidden" id="password" placeholder="Enter password" name="oldPassword" value="<?php echo $userRecord->password ?>">
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="required">Email</label>
+      <input type="email" id="email" placeholder="Enter email" value="<?php echo $userRecord->email ?>" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="fullname" class="required">Full Name</label>
+      <input type="text" id="fullname" placeholder="Enter full name" value="<?php echo $userRecord->fullName ?>" name="fullName">
+    </div>
+
+    <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save</button>
+  </form>
+
+
+
+==================================================
+=== FILE: ./Views/Pages/MemberManage.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+ echo (new Head('Add Member', 'addMember'))->Render();
+
+?>
+<div class="container">
+    <h1>لوحة إدارة الأعضاء</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>#ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Full Name</th>
+          <th>Date Regester</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+       <?php foreach ($rows as $row): ?>
+        <tr>
+          <td><?php echo $row['UserID']; ?></td>
+          <td><?php echo $row['Username']; ?></td>
+          <td><?php echo $row['Email']; ?></td>
+          <td><?php echo $row['FullName']; ?></td>
+          <td><?php echo $row['Date_Reg']; ?></td>
+          <td>
+            <a class='btn-blue' href="<?php echo BASE_URL . 'members/' . $row['UserID'] . '/edit'; ?>" class="table-control">Edit</a>
+            <?php if($row['RegStatus'] == 0){ ?>
+              <a class='btn-green' href="<?php echo BASE_URL . 'members/' . $row['UserID'] . '/accept'; ?>" class="table-control">Accept</a>
+            <?php } ?>
+            <a class='btn-red' href="<?php echo BASE_URL . 'members/' . $row['UserID'] . '/delete'; ?>" class="table-control">Delete</a>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+      </tbody>
+    </table>
+    <button class="add-member">+ إضافة عضو جديد</button>
+  </div>
+<?php 
+
+
+    echo (new Footer('script', 'chart.umd.min'))->Render();
+
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Pages/Dashboard.php
+==================================================
+<section class="dashboard-container">
+        <div class="dashboard-stats">
+
+        <!-- Bar Dashboard -->
+                <div class="d-bar">
+                        <input type="text" id="" placeholder="Search Here...">
+                        <button>
+                                <i class="fas fa-solid fa-bell"></i>
+                        </button>
+                </div>
+
+                <div class="d-hello">
+                        <h3>Lorem ipsum dolor sit amet consectetur.</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam.</p>
+                </div>
+
+                <!-- Charts -->
+
+                <div class="charts-row">
+                        <div class="chart-box">
+                                <canvas class="charts" id="charts"></canvas>
+                                <canvas class="charts">
+                                        .......
+                                </canvas>
+                                <canvas class="charts">
+                                        ........
+                                </canvas>
+                        </div>
+                </div> 
+
+                <div class="d-stats-info">
+                        <div class="d-pie">
+<?php
+
+use Core\Database\DBConnection;
+use Repositories\UserRepository;
+
+                $repo = new UserRepository( ( new DBConnection() )->getConnection() );
+                echo $repo->sumCountAllUsers();
+
+
+
+?>
+                        </div>
+                        <div class="d-line">
+                                charts
+                        </div>
+                </div>
+
+        </div>
+
+        <div class="dashboard-info">
+                <h3>My Profile</h3>
+                <div class="d-profile">
+                        <div class="d-profile-name">
+                                <img src="<?php
+
+                                        use Core\Helper\URL;
+
+                                        echo URL::ico('editmembers') ?>" alt="">
+                                <div class="d-txt">
+                                        <h4>Samer</h4>
+                                        <span>Lorem ipsum dolor sit.</span>
+                                        <div class="d-addr">
+                                                <i class="fa fa-map-marker"></i> 
+                                                <span>Lorem, ipsum.</span>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="d-profile-box">
+                                <div>
+                                        <span>lorem</span>
+                                        <p>43</p>
+                                </div>
+                                <div>
+                                        <span>lorem</span>
+                                        <p>56</p>
+                                </div>
+                                <div>
+                                        <span>lorem</span>
+                                        <p>432423</p>
+                                </div>
+                        </div>
+                </div>
+
+                <div class="d-commends">
+                        <h3>Last 10 Commends</h3>
+                        <div class="d-c-list">
+                                <span>good</span>
+                                <span>good</span>
+                                <span>good</span>
+                                <span>good</span>
+                                <span>good</span>
+                                <span>good</span>
+                                <span>good</span>
+                                <span>good</span>
+                        </div>
+                </div>
+
+        </div>
+
+</section>
+
+
+==================================================
+=== FILE: ./Views/Pages/Login.php
+==================================================
+<form action="<?php echo BASE_URL . 'login'; ?>" method="post" class="login">
+        <h2>login system</h2>
+        <input type="text" placeholder="username" name="username" class="username">
+        <input type="password" placeholder="password" name="password" class="password">
+        <div class="password-box">
+            <i class="fa fa-eye" id="eye"></i> show password
+        </div>
+        <input type="submit" value="Login" class="input-button">
+        <div class="login-icon">
+            <i class="fab fa-facebook"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-tiktok"></i>
+        </div>
+</form>
+
+
+==================================================
+=== FILE: ./Views/Pages/AddMember.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+ echo (new Head('Add Member', 'addMember'))->Render();
+
+?>
+  <form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/insert'; ?>">
+    <h2><i class="fa fa-user-edit"></i> Add a Member</h2>
+
+    <div class="form-group">
+      <label for="username" class="required">Username</label>
+      <input type="text" id="username" placeholder="Enter username" name="username" value="" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password" class="required">Password</label>
+      <input type="password" id="password" placeholder="Enter password" value="" name="newPassword">
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="required">Email</label>
+      <input type="email" id="email" placeholder="Enter email" value="" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="fullname" class="required">Full Name</label>
+      <input type="text" id="fullname" placeholder="Enter full name" value="" name="fullName">
+    </div>
+
+    <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save</button>
+  </form>
+<?php 
+
+
+    echo (new Footer('script', 'chart.umd.min'))->Render();
+
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Pages/Categories/ShowCategories.php
+==================================================
+<?php
+
+use Core\Helper\URL;
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+    echo ( new Head('Categories', '') )->Render(); ?>
+
+    <main class="all-categories">
+       
+
+        <?php 
+        
+                  foreach($rows as $row) {
+                    echo '<div class="cat-section">';
+                    echo '<h4>' . $row['Name'] . '</h4>';
+                        echo '<a href=\'category/edit\'>edit</a>' . '<a href=\'category/delete\'>delete</a>';
+                    echo '<div class="cat">';
+                    echo '<img src="' . URL::ico('404') . '" alt="">';
+                    echo '<p>'. $row['Description'] .'</p>';
+                    echo '<div class="cat-config">';
+                        echo $row['Order'];
+                        echo $row['Visibility'];
+                        echo $row['Allow_Comment'];
+                        echo $row['Allow_Ads'];
+                    echo '</div>';
+
+                    echo '<a href="" class="cat-view">View</a>';
+                    echo ' </div>';
+
+                  }      
+        
+                ?>
+        </div>
+
+    </main>
+
+
+
+<?php
+
+    echo ( new Footer('script', '') )->Render();
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Pages/Categories/AddCategory.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+ echo (new Head('Add Category', 'addMember'))->Render();
+
+?>
+<form class="container" method="POST" action="<?php echo BASE_URL . 'categories/add'; ?>">
+<div class="card">
+  <div class="card-header">
+    <h2>Add a new Category</h2>
+  </div>
+  <!-- ضع العناصر التالية داخل هذه البطاقة -->
+</div>
+<div class="field">
+  <label class="label">
+    Category Name
+    <span class="req" aria-hidden="true">*</span>
+  </label>
+  <input type="text" class="input" placeholder="" required name="name">
+</div>
+<div class="field">
+  <label class="label">Description Category</label>
+  <textarea class="textarea" rows="3" placeholder="Describe" name="description"></textarea>
+</div>
+<div class="field">
+  <label class="label">Sort</label>
+  <div class="number-wrap">
+    <input type="number" class="input number-input" min="0" step="1" placeholder="ex: 10" name="order">
+    <span class="suffix">#</span>
+  </div>
+
+</div>
+<div class="field">
+  <label class="label">Visibility</label>
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="visible" value="1" checked>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">Yes</span>
+    </label>
+    <label class="radio-item">
+      <input type="radio" name="visible" value="0">
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">No</span>
+    </label>
+  </div>
+</div>
+
+<div class="field">
+  <label class="label">Allow Comments </label>
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="comments" value="1" checked>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">Yes</span>
+    </label>
+    <label class="radio-item">
+      <input type="radio" name="comments" value="0">
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">No</span>
+    </label>
+  </div>
+</div>
+
+<div class="field">
+  <label class="label">Allow Ads </label>
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="ads" value="1" checked>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">Yes</span>
+    </label>
+    <label class="radio-item">
+      <input type="radio" name="ads" value="0">
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">No</span>
+    </label>
+  </div>
+</div>
+<div class="actions">
+  <button type="submit" class="btn-primary">
+    Add Category
+  </button>
+</div>
+</form>
+<?php 
+
+
+    echo (new Footer('script', 'chart.umd.min'))->Render();
+
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Layouts/Footer.php
+==================================================
+<?php
+
+    namespace Views\Layouts;
+
+use Core\Helper\URL;
+use Core\Interfaces\ILayouts;
+
+    class Footer implements ILayouts {
+
+        // protected ?string $path1 = null;
+        protected string $js;
+        protected string $charts;
+
+        public function __construct(?string $path1, ?string $path2)
+        {
+                $this->charts   = URL::js($path1);
+                $this->js       = URL::js($path2);
+        }
+
+        public function Render(): string
+        {
+            return <<< HTML
+            </body>
+                <script src="{$this->charts}"></script>
+                <script src="{$this->js}"></script>
+            </html>
+            HTML;    
+        }
+
+    }
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Layouts/Navbar.php
+==================================================
+<?php
+
+    namespace Views\Layouts;
+
+use Core\Database\DBConnection;
+use Core\Interfaces\ILayouts;
+use Repositories\UserRepository;
+use Services\LanguageLoader;
+
+    class Navbar implements ILayouts {
+
+        private LanguageLoader $language;
+        private UserRepository $getUsername;
+        private $Username;
+        private string $urlLogout = BASE_URL . 'logout';
+
+        public function Render(): string
+        {
+            $this->language = new LanguageLoader('en');
+            $this->getUsername = new UserRepository( (new DBConnection())->getConnection() );
+            $this->Username = $this->getUsername->findById($_SESSION['UserID']);
+            $editUrl = BASE_URL . 'members?do=edit&userid=' . $_SESSION['UserID'];
+
+            return <<< HTML
+
+            <nav class='main-nav-bar'>
+
+                <div class="container">
+                    <ul class='mnb-list'>
+                        <li>
+                            <a href="">{$this->language::getKeyword('home')}</a>
+                        </li>
+
+                        <li>
+                            <a href="/categories">{$this->language::getKeyword('categories')}</a>
+                        </li>
+
+                        <li>
+                            <a href="">{$this->language::getKeyword('members')}</a>
+                        </li>
+
+                        <li>
+                            <a href="">{$this->language::getKeyword('item')}</a>
+                        </li>
+
+                        <li>
+                            <a href="">{$this->language::getKeyword('logs')}</a>
+                        </li>
+
+                        <li>
+                            <a href="">{$this->language::getKeyword('statistics')}</a>
+                        </li>
+
+                    </ul>
+
+                    <div class="nav-drop-down">
+                        <span>{$this->Username->getUsername()}</span>
+                            <ul class="ndd-list">
+                                <li>
+                                    <a href="{$editUrl}"><i class=''></i> {$this->language::getKeyword('editmember')} </a>
+                                </li>
+
+                                <li>
+                                    <a href=""><i class=''></i> {$this->language::getKeyword('settings')} </a>
+                                </li>
+
+                                <li>
+                                    <a href="{$this->urlLogout}"><i class=''></i> {$this->language::getKeyword('logout')} </a>
+                                </li>
+                            </ul>
+                    </div>
+
+                </div>
+
+            </nav>
+
+
+            HTML;
+        }
+
+    }
+
+
+==================================================
+=== FILE: ./Views/Layouts/Head.php
+==================================================
+<?php
+
+    namespace Views\Layouts;
+
+    use Core\Abstracts\AbstractLayouts;
+    use Core\Interfaces\ILayouts;
+    use Core\Helper\URL;
+
+    class Head extends AbstractLayouts implements ILayouts {
+
+        protected string $title  = 'Defualt';
+        protected $css;
+        protected $fontAwesome;
+        protected $favicon;
+
+        public function __construct($title, $ico)
+        {
+            // $this->url = ;
+            $this->title = $title;
+            $this->css = URL::css('style');
+            $this->fontAwesome = URL::css('all.min');
+            $this->favicon = URL::ico($ico);
+        }
+
+                public function Render() : string {
+        
+                    return <<< HTML
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link rel="stylesheet" href="{$this->css}">
+                            <link rel="stylesheet" href="{$this->fontAwesome}">
+                            <link rel="shortcut icon" href="{$this->favicon}" type="image/x-icon">
+                            <title>{$this->title}</title>
+                        </head>
+                        <body>
+                        
+                        HTML;
+                }
+
+    }
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Components/LoadingIcon.php
+==================================================
+<?php
+
+    namespace Views\Components;
+
+    use Core\Abstracts\AbstractLayouts;
+    use Core\Interfaces\ILayouts;
+    use Core\Helper\URL;
+
+    class LoadingIcon extends AbstractLayouts implements ILayouts {
+
+        protected string $title  = 'Defualt';
+        protected $css;
+        protected $fontAwesome;
+        protected $favicon;
+
+        public function __construct($title, $ico)
+        {
+            
+        }
+
+                public function Render() : string {
+        
+                    return <<< HTML
+                        
+                            <div class='.load-icon'>
+                                <img src="{URL::}" alt="">
+                            </div>
+
+                        HTML;
+                }
+
+    }
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Public/index.php
+==================================================
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once __DIR__ . '/../Core/Bootstrap/Bootstrap.php';
+require_once __DIR__ . '/../Core/Router/Router.php';
+
+use Controllers\AuthController;
+use Controllers\CategoriesController;
+use Controllers\DashboardController;
+use Controllers\MembersController;
+use Core\Helper\URL;
+use Core\Router\Router;
+use Services\SessionsServices;
+
+// إنشاء الراوتر
+$router = new Router();
+
+/**
+ * صفحة تسجيل الدخول
+ */
+$router->add('login', function() {
+    $auth = new AuthController();
+    $auth->login();
+});
+$router->add('/', function() {
+    $auth = new AuthController();
+    $auth->login();
+});
+/**
+ * تسجيل الخروج
+ */
+$router->add('logout', function() {
+    $session = new SessionsServices();
+    $session->start();
+    $session->destroy();
+    URL::redirect('login');
+});
+
+/**
+ * لوحة التحكم
+ */
+$router->add('dashboard', function() {
+    new SessionsServices();
+    $DSH = new DashboardController();
+    $DSH->index();
+});
+
+/**
+ * عرض قائمة الأعضاء
+ */
+$router->add('members', function() {
+    $members = new MembersController();
+    $members->index();
+});
+
+/**
+ * تعديل عضو محدد عبر البارامتر {id}
+ * مثال: /members/15/edit
+ */
+$router->add('members/{id}/edit', function($id) {
+    $members = new MembersController();
+    $members->edit((int)$id);
+});
+$router->add('members/{id}/delete', function($id) {
+    $members = new MembersController();
+    $members->delete((int)$id);
+});
+
+$router->add('members/pending', function() {
+    $members = new MembersController();
+    $members->getPendingUsers();
+});
+$router->add('members/{id}/accept', function($id) {
+    $members = new MembersController();
+    $members->acceptUser($id);
+});
+$router->add('members/{id}/activate', function($id) {
+    $members = new MembersController();
+    $members->acceptUser($id);
+});
+
+$router->add('api/getUsersWithDates', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getUsersWithDates();
+
+});
+
+$router->add('members/insert', function() {
+    $members = new MembersController();
+    $members->insert();
+});
+
+
+$router->add('categories', function() {
+    $categories = new CategoriesController();
+    $categories->index();
+});
+
+$router->add('categories/add', function() {
+    $categories = new CategoriesController();
+    $categories->insert();
+});
+
+
+
+/**
+ * صفحة الخطأ 404
+ */
+$router->add('404', function() {
+    include BASE_PATH . 'Views/Pages/404.php';
+});
+
+// تنفيذ التوجيه
+$router->dispatch();
+
+
+
+==================================================
+=== FILE: ./APIs/getUsersWithDates.php
+==================================================
+<?php 
+
+    namespace APIs;
+    use Repositories\UserRepository;
+    use Core\Database\DBConnection;
+
+
+
+
+    $repo = new UserRepository( ( new DBConnection() )->getConnection() );
+        $records = $repo->getUsersAndDates();
+        // header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($records, JSON_UNESCAPED_UNICODE);
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Database/DBConnection.php
+==================================================
+<?php
+namespace Core\Database;
+use Core\Interfaces\IDBConnection;
+use Core\Abstracts\AbstractDBConnection;
+use PDO;
+use PDOException;
+
+class DBConnection extends AbstractDBConnection implements IDBConnection {
+
+    public function connect(): void {
+        if ($this->PDO === null) {
+            try {
+                $this->PDO = new PDO(
+                    $this->DSN,
+                    $this->Username,
+                    $this->Password,
+                    $this->Config
+                );
+                $this->PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                throw new \Exception("Database connection failed: " . $e->getMessage());
+            }
+        }
+    }
+
+    public function getConnection(): PDO {
+        if ($this->PDO === null) {
+            $this->connect();
+        }
+        return $this->PDO;
+    }
+}
+?>
+
+
+==================================================
+=== FILE: ./Core/Config/Config.php
+==================================================
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// BASE_PATH = جذر المشروع
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
+}
+
+// BASE_URL
+if (!defined('BASE_URL')) {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptName = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+    if (substr($scriptName, -6) === '/Public') {
+        $scriptName = substr($scriptName, 0, -6);
+    }
+    define('BASE_URL', rtrim($protocol . "://" . $host . $scriptName, '/') . '/');
+}
+
+// Autoloader
+require_once BASE_PATH . 'Core/Autoloader/Autoloader.php';
+\Core\Autoloader\Autoloader::register();
+?>
+
+
+==================================================
+=== FILE: ./Core/Interfaces/ISessions.php
+==================================================
+<?php
+
+    namespace Core\Interfaces;
+
+    interface ISessions {
+
+        public function start(): bool;
+        public function set(string $key, string $value): bool;
+        public function get(string $key) : string;
+        public function has(string $key): bool;
+        public function remove(string $key): void;
+        public function destroy(): bool;
+
+        // public function regenerateId(bool $deleteOld = true): void;
+        // public function setFlash(string $key, string $message): void;
+        // public function getFlash(string $key): ?string;
+
+        // public function all(): array;
+        // public function clear(): void;
+}
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Interfaces/IDBConnection.php
+==================================================
+<?php
+namespace Core\Interfaces;
+
+use PDO;
+
+interface IDBConnection {
+    public function connect(): void;
+    public function getConnection(): PDO;
+}
+?>
+
+
+==================================================
+=== FILE: ./Core/Interfaces/ILanguage.php
+==================================================
+<?php
+
+    namespace Core\Interfaces;
+
+    interface ILanguage {
+
+        public static function getKeyword ($key) : string;
+
+    }
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Interfaces/ILayouts.php
+==================================================
+<?php
+
+    namespace Core\Interfaces;
+
+    interface ILayouts {
+
+        public function Render() : string;
+
+    }
+    ?>
+
+
+==================================================
+=== FILE: ./Core/Helper/URL.php
+==================================================
+<?php
+
+  namespace Core\Helper;
+
+class URL {
+    public static function js($file): string {
+        return \BASE_URL . 'js/' . $file . '.js';
+    }
+
+    public static function css($file): string {
+        return \BASE_URL . 'css/' . $file . '.css';
+    }
+
+    public static function ico($file): string {
+        return \BASE_URL . 'ico/' . $file . '.ico';
+    }
+
+    public static function language($lang): array {
+        return [\BASE_URL . '/Language/' . $lang];
+    }
+
+    public static function redirect(string $page): void {
+    header('Location: ' . BASE_URL . $page);
+    exit();
+
+}
+
+}
+
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Helper/FlashMessage.php
+==================================================
+<?php
+namespace Core\Helper;
+
+use Services\SessionsServices;
+
+class FlashMessage {
+
+    private static SessionsServices $session;
+
+    public static function init(): void {
+        self::$session = new SessionsServices();
+    }
+
+    public static function success(string $message): void {
+        self::$session->set('flash_message', Alert::Print($message, 'success'));
+    }
+
+    public static function error(string $message): void {
+        self::$session->set('flash_message', Alert::Print($message, 'error'));
+    }
+
+    public static function warning(string $message): void {
+        self::$session->set('flash_message', Alert::Print($message, 'warning'));
+    }
+
+    public static function info(string $message): void {
+        self::$session->set('flash_message', Alert::Print($message, 'info'));
+    }
+
+    public static function display(): void {
+        if (self::$session->has('flash_message')) {
+            echo self::$session->get('flash_message');
+            self::$session->remove('flash_message'); // حتى لا تتكرر الرسالة
+        }
+    }
+}
+
+
+
+==================================================
+=== FILE: ./Core/Helper/Alert.php
+==================================================
+<?php
+namespace Core\Helper;
+
+class Alert {
+
+    /**
+     * طباعة رسالة خطأ/تحذير/معلومة
+     *
+     * @param string $message  نص الرسالة
+     * @param string $type     نوع الرسالة: error | warning | info | success
+     * @return string          HTML جاهز للطباعة
+     */
+    public static function Print(string $message, string $type = 'info'): string {
+        // تحديد الكلاس المناسب
+        $classMap = [
+            'error'      => 'alert alert-error',
+            'warning'    => 'alert alert-warning',
+            'info'       => 'alert alert-info',
+            'success'    => 'alert alert-success'
+        ];
+
+        $cssClass = $classMap[$type] ?? $classMap['info'];
+
+        return <<<HTML
+        <div class="{$cssClass}">
+            {$message}
+        </div>
+        HTML;
+    }
+}
+
+
+
+==================================================
+=== FILE: ./Core/Bootstrap/Bootstrap.php
+==================================================
+<?php
+
+use Services\SessionsServices;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// BASE_PATH = جذر المشروع
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
+}
+
+// BASE_URL
+if (!defined('BASE_URL')) {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptName = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+    if (substr($scriptName, -6) === '/Public') {
+        $scriptName = substr($scriptName, 0, -6);
+    }
+    define('BASE_URL', rtrim($protocol . "://" . $host . $scriptName, '/') . '/');
+}
+
+// Autoloader
+require_once BASE_PATH . 'Core/Autoloader/Autoloader.php';
+\Core\Autoloader\Autoloader::register();
+
+(new SessionsServices())->start();
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Autoloader/Autoloader.php
+==================================================
+<?php
+
+  namespace Core\Autoloader;
+
+class Autoloader {
+    public static function register(): void {
+        spl_autoload_register(function ($class) {
+            $baseDir = __DIR__ . '/../../'; # => eComm
+            $classPath = str_replace('\\', '/', $class) . '.php';
+            $file = $baseDir . $classPath;
+
+            if (file_exists($file)) {
+                require_once $file;
+            }
+        });
+    }
+}
+
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Router/Router.php
+==================================================
+<?php
+namespace Core\Router;
+
+class Router {
+    protected array $routes = [];
+
+    /**
+     * تسجيل مسار مع إمكانية وجود بارامترات ديناميكية
+     * مثال: members/{id}/edit
+     */
+    public function add(string $pattern, callable $callback): void {
+        // استبدال {param} بـ Regex يلتقط القيمة
+        $regex = preg_replace(
+            '#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#',
+            '(?P<$1>[^/]+)',
+            $pattern
+        );
+
+        // بناء Regex كامل مع حدود البداية والنهاية
+        $regex = '#^' . trim($regex, '/') . '$#i';
+
+        // تخزين المسار
+        $this->routes[] = [
+            'regex'    => $regex,
+            'callback' => $callback
+        ];
+    }
+
+    /**
+     * استخراج المسار المطلوب من الرابط
+     * يتجاهل أي Query String أو Fragment
+     */
+    public function resolvePath(): string {
+        $uriPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
+        return trim($uriPath, '/');
+    }
+
+    /**
+     * تنفيذ التوجيه
+     */
+    public function dispatch(): void {
+        $requested = $this->resolvePath();
+
+        foreach ($this->routes as $route) {
+            if (preg_match($route['regex'], $requested, $matches)) {
+                // استخراج البارامترات المسماة فقط
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+                // تنفيذ الكولباك مع البارامترات
+                call_user_func_array($route['callback'], $params);
+                return;
+            }
+        }
+
+        // إذا لم يوجد تطابق → 404
+        http_response_code(404);
+        echo "<h2>404 - Page Not Found</h2>";
+    }
+}
+
+
+
+==================================================
+=== FILE: ./Core/Abstracts/AbstractLayouts.php
+==================================================
+<?php
+
+    namespace Core\Abstracts;
+
+    abstract class AbstractLayouts {
+
+        protected string $title;
+
+    }
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Abstracts/AbstractDBConnection.php
+==================================================
+<?php
+namespace Core\Abstracts;
+
+use Core\Interfaces\IDBConnection;
+use PDO;
+
+abstract class AbstractDBConnection {
+    protected string $Username = 'root';
+    protected string $Password = 'root';
+    protected string $DSN      = 'mysql:host=eComm.local;dbname=shop;';
+    protected array $Config    = [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'];
+
+    protected ?PDO $PDO = null;
+}
+?>
+
+
+==================================================
+=== FILE: ./Core/Abstracts/AbstractLanguage.php
+==================================================
+<?php
+
+    namespace Core\Abstracts;
+
+    use Exception;
+
+    abstract class AbstractLanguage {
+
+        protected static array $language = [];
+
+
+        public static function getKeyword($key) : string {
+
+            return self::$language[$key];
+
+        }
+
+        public function __construct(string $file = 'en') {
+
+            $langFilePath = BASE_PATH . '/Language/' . $file . '.php';
+
+            if(file_exists($langFilePath)) {
+
+                $translations = include $langFilePath;
+
+                    if(is_array($translations)) {
+
+                        self::$language = $translations;
+
+                    } else {
+
+                        throw new Exception('The language file does not contain a valid array !');
+
+                    }
+
+            } else {
+
+                        throw new Exception('The Language File does NOT Exist');
+
+            }
+
+        }
+
+    }
+
+?>
+
+
+==================================================
+=== FILE: ./Core/Abstracts/AbstractSessions.php
+==================================================
+<?php
+
+   namespace Core\Abstracts;
+
+use Core\Interfaces\ISessions;
+
+abstract class AbstractSessions implements ISessions {
+
+    public function start(): bool
+    {
+        $name     = 'ecomm';
+        $lifetime = 0;
+        $path     = '/';
+        $secure   = false; // غيّرها إلى true في HTTPS
+        $httpOnly = true;
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return false; // الجلسة شغالة بالفعل
+        }
+
+        // إعدادات أمان إضافية
+        ini_set('session.use_strict_mode', '1');
+        ini_set('session.use_only_cookies', '1');
+        ini_set('session.use_trans_sid', '0');
+
+        session_name($name);
+
+        session_start([
+            'cookie_lifetime' => $lifetime,
+            'cookie_path'     => $path,
+            'cookie_secure'   => $secure,
+            'cookie_httponly' => $httpOnly,
+        ]);
+
+        return true;
+    }
+
+    public function set(string $key, string $value) : bool {
+
+        if(session_status() !== PHP_SESSION_ACTIVE) $this->start();
+
+            $_SESSION[$key] = $value;
+
+            return isset($_SESSION[$key]) && $_SESSION[$key] === $value;
+
+    }
+
+    public function get(string $key) : string {
+
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            $this->start();
+        }
+
+        if (isset($_SESSION[$key]) && is_string($_SESSION[$key])) {
+            return $_SESSION[$key];
+        }
+
+        return 'No Session Data..';
+    }
+
+    public function has(string $key): bool {
+
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            $this->start();
+        }
+
+        return isset($_SESSION[$key]);
+    }
+
+    public function remove(string $key): void {
+            
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            $this->start();
+        }
+
+        if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
+        }
+    }
+
+    public function destroy(): bool {
+
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            $this->start();
+        }
+
+        // مسح بيانات الجلسة
+        $_SESSION = [];
+
+        // حذف الكوكيز الخاصة بالجلسة
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
+
+        // تدمير الجلسة
+        return session_destroy();
+    }
+
+
+    
+}
+
+?>
+
+
+==================================================
+=== FILE: ./Model/User.php
+==================================================
+<?php
+
+    namespace Model;
+
+    class User {
+        public int $userID;
+        public string $username;
+        public string $password;
+        public string $email;
+        public string $fullName;
+        public int $userType;
+        public int $trustStatus;
+        public int $regStatus;
+        public string $dateReg;
+        public ?string $avatar; // nullable
+
+        public function __construct(
+            int $userID,
+            string $username,
+            string $password,
+            string $email,
+            string $fullName,
+            int $userType,
+            int $trustStatus,
+            int $regStatus,
+            string $dateReg,
+            ?string $avatar = null
+        ) {
+        $this->userID = $userID;
+        $this->username = $username;
+        $this->password = $password;
+        $this->email = $email;
+        $this->fullName = $fullName;
+        $this->userType = $userType;
+        $this->trustStatus = $trustStatus;
+        $this->regStatus = $regStatus;
+        $this->dateReg = $dateReg;
+        $this->avatar = $avatar;
+    }
+
+    public function getUsername(): string {
+        return $this->username;
+    }
+
+
+}
+
+
+==================================================
+=== FILE: ./Model/Category.php
+==================================================
+<?php 
+
+    namespace Model;
+
+    class Category {
+        public int $ID;
+        public string $Name;
+        public string $Description;
+        public int $Order;
+        public int $Visibility;
+        public int $Allow_Comment;
+        public int $Allow_Ads;
+
+        public function __construct(
+            int $ID,
+            string $Name,
+            string $Description,
+            int $Order,
+            int $Visibility,
+            int $Allow_Comment,
+            int $Allow_Ads
+        )
+        {
+            $this->ID = $ID;
+            $this->Name = $Name;
+            $this->Description = $Description;
+            $this->Order = $Order;
+            $this->Visibility = $Visibility;
+            $this->Allow_Comment = $Allow_Comment;
+            $this->Allow_Ads = $Allow_Ads;
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Language/en.php
+==================================================
+<?php
+
+
+
+    return [
+        'loginSys' => 'login to system',
+        'home' => 'home',
+        'categories' => 'categories',
+        'members' => 'members',
+        'item' => 'item',
+        'logs' => 'logs',
+        'statistics' => 'statistics',
+        'logout' => 'logout',
+        'editmember' => 'Member Edit',
+        'settings' => 'settings',
+    ];
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Services/AuthLogin.php
+==================================================
+<?php
+
+    namespace Services;
+
+use Core\Helper\Alert;
+use Repositories\UserRepository;
+
+    class AuthLogin {
+
+        private UserRepository $repo;
+
+        public function __construct(UserRepository $repo)
+        {
+            $this->repo = $repo;
+        }
+
+        public function verifyLogin(string $username, string $password) {
+
+            $row = $this->repo->findByUsername($username);
+
+            if (!$row) {
+                Alert::Print('error Verify Login', 'error');
+                return false;
+            };
+
+            if (password_verify($password, $row->password)) {
+                
+                return $row ?? true;
+            }
+
+
+        }
+
+    }
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Services/MemberService.php
+==================================================
+<?php
+
+    namespace Services;
+    use Repositories\UserRepository;
+    use Core\Database\DBConnection;
+    use Core\Helper\Alert;
+
+    class MemberService {
+
+         private UserRepository $repo;
+
+    public function __construct() {
+        $this->repo = new UserRepository((new DBConnection())->getConnection());
+    }
+
+    public function getMemberById(int $id) {
+        return $this->repo->findById($id);
+    }
+
+
+    public function updateMember(array $data): bool {
+
+        $userid   = intval($data['userid']);
+
+        $username = trim($data['username']);
+
+        $email    = trim($data['email']);
+        
+        $fullname = trim($data['fullName']);
+
+        $password = !empty($data['newPassword'])
+            ? password_hash($data['newPassword'], PASSWORD_DEFAULT)
+            : $data['oldPassword'];
+
+            Alert::Print("تم التحديث بنجاح", 'success');
+
+        return $this->repo->updateUser($userid, $username, $password, $email, $fullname);
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Services/CategoryService.php
+==================================================
+<?php 
+
+    namespace Services;
+
+use Core\Database\DBConnection;
+use Core\Helper\FlashMessage;
+use Repositories\CategoryRepository;
+
+    class CategoryService {
+        private CategoryRepository $repo;
+
+
+        public function __construct(CategoryRepository $repo)
+        {
+            $this->repo = $repo;
+        }
+
+        public function create(array $data) : bool {
+
+            $error_log = [];
+            
+
+            if(empty($data['name'])) {
+
+                $error_log[] = 'The Category Name is empty!';
+
+            } elseif (empty($data['order'])) {
+
+                $error_log[] = 'The Order Number is empty!';
+
+            }
+
+            if(!empty($error_log)) {
+                FlashMessage::init();
+                foreach($error_log as $error) {
+                    FlashMessage::error($error . "<br><hr>");
+                }
+                return false;
+            }
+
+            $result = $this->repo->insert($data);
+            return (bool) $result;
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Services/LanguageLoader.php
+==================================================
+<?php
+
+    namespace Services;
+
+    use Core\Abstracts\AbstractLanguage;
+    use Core\Interfaces\ILanguage;
+
+    class LanguageLoader extends AbstractLanguage implements ILanguage {}
+
+
+?>
+
+
+==================================================
+=== FILE: ./Services/SessionsServices.php
+==================================================
+<?php
+
+    namespace Services;
+
+    use Core\Abstracts\AbstractSessions;
+    use Core\Interfaces\ISessions;
+
+    class SessionsServices extends AbstractSessions implements ISessions {}
+
+?>
+
+
+==================================================
+=== FILE: ./Controllers/AuthController.php
+==================================================
+<?php
+
+namespace Controllers;
+
+use Core\Database\DBConnection;
+use Services\AuthLogin;
+use Services\SessionsServices;
+use Core\Helper\URL;
+use Repositories\UserRepository;
+use Views\Layouts\Head;
+class AuthController {
+    private AuthLogin $auth;
+
+    public function __construct()
+    {
+        $this->auth = new AuthLogin((new UserRepository((new DBConnection())->getConnection())));
+        // $this->auth->
+    }
+
+    public function login() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            $row = $this->auth->verifyLogin($username, $password);
+            if ($row) {
+                // بدء الجلسة
+                
+                $session = new SessionsServices();
+                $session->start();
+                $session->set('username', $username);
+                $session->set('UserID', $row->userID);
+
+                // التوجيه إلى لوحة التحكم
+                URL::redirect('dashboard');
+                exit;
+            } else {
+                // echo (new Head('Login System'))->Render();
+
+                echo "<p style='color:red'>Invalid credentials</p>";
+                include BASE_PATH . 'Views/Pages/Login.php';
+            }
+        } else {
+            // أول مرة يفتح الصفحة → عرض الفورم
+                echo (new Head('Login System', 'login'))->Render();
+            include BASE_PATH . 'Views/Pages/Login.php';
+        }
+    }
+}
+?>
+
+
+==================================================
+=== FILE: ./Controllers/CategoriesController.php
+==================================================
+<?php 
+
+namespace Controllers;
+
+use Core\Database\DBConnection;
+use Core\Helper\FlashMessage;
+use Core\Helper\URL;
+use Model\Category;
+use Repositories\CategoryRepository;
+use Services\SessionsServices;
+
+class CategoriesController {
+
+
+
+
+    public function __construct()
+    {
+            new SessionsServices();
+    }
+
+    public function index() {
+        // $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+        // $rows = $repo->findById(1);
+
+        FlashMessage::init();
+        FlashMessage::display();
+
+        $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+        $rows = $repo->showAllCategories();
+
+        include BASE_PATH . '/Views/Pages/Categories/ShowCategories.php';
+    }
+
+    public function insert() {
+        
+        
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            $categoryData = [
+                'name'        => trim($_POST['name'] ?? ''),
+                'description' => trim($_POST['description'] ?? ''),
+                'order'       => (int)($_POST['order'] ?? 0),
+                'visible'     => (int)($_POST['visible'] ?? 1),
+                'comments'    => (int)($_POST['comments'] ?? 1),
+                'ads'         => (int)($_POST['ads'] ?? 1),
+            ];
+            
+            $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+            if($repo->isExist($categoryData['name'])) {
+                    FlashMessage::init();
+                    FlashMessage::warning('This Category Already Exists');
+                    FlashMessage::display();
+                    echo 'Samer 404';
+            } else {
+                $status = $repo->insert($categoryData);
+
+                if($status) {
+                    FlashMessage::init();
+                    FlashMessage::success("Category Added");
+                    URL::redirect('categories');
+                } else {
+                    FlashMessage::init();
+                    FlashMessage::warning('Error');
+                    // URL::redirect($_SERVER['PHP_SELF']);
+                }
+
+            }
+            
+        }
+        include BASE_PATH . '/Views/Pages/Categories/AddCategory.php';
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Controllers/MembersController.php
+==================================================
+<?php
+
+
+namespace Controllers;
+
+use Core\Database\DBConnection;
+use Core\Helper\Alert;
+use Core\Helper\URL;
+use Model\User;
+use PDO;
+use Repositories\UserRepository;
+use Services\MemberService;
+use Services\SessionsServices;
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
+use Soap\Url as SoapUrl;
+
+    class MembersController {
+
+        private MemberService $Service;
+
+
+        public function __construct()
+        {
+            $this->Service = new MemberService();
+        }
+
+
+
+        public function index() {       
+                
+                    FlashMessage::init();
+                    FlashMessage::display();
+
+                    $users = new UserRepository(( new DBConnection())->getConnection() );
+                    $rows = $users->getAllMembers();
+
+                    include BASE_PATH . '/Views/Pages/MemberManage.php';
+    }
+
+
+        public function getPendingUsers() {
+            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
+            $rows = $repo->getPendingUser();
+            include BASE_PATH . '/Views/Pages/MemberManage.php';
+        }
+
+        public function acceptUser($id) : void {
+
+            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
+            $rows = $repo->acceptUser($id);
+            FlashMessage::init();
+            FlashMessage::success('The User has Accepted');
+            URL::redirect('members');
+
+        }
+
+        public function edit(int $id) {
+
+        echo (new Head('Edit Member', 'editmembers'))->Render();
+
+        $user = $this->Service->getMemberById($id);
+
+        if ($user) {
+
+            $rows = $user;
+
+            include BASE_PATH . 'Views/Pages/Members.php';
+
+        } else {
+
+            Alert::Print("المستخدم غير موجود", 'error');
+            URL::redirect('404');
+        }
+
+        echo (new Footer('script', ''))->Render();
+    }
+
+
+        public function delete(int $id) {
+
+            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
+            $repo->deleteUser($id);
+            FlashMessage::init();
+            FlashMessage::success('The User Has been deleted');
+            URL::redirect('members');
+
+        }
+
+        public function insert() {
+
+            $session = new SessionsServices();
+
+            if($_SERVER['REQUEST_METHOD'] === "POST") {
+                
+                $username = trim($_POST['username']);
+                $password = password_hash($_POST['newPassword'], PASSWORD_DEFAULT);
+                $email    = trim($_POST['email']);
+                $fullname = trim($_POST['fullName']);
+                $avatar   = null; // لاحقاً يمكن إضافة رفع صورة
+
+                $repo = new UserRepository((new DBConnection())->getConnection());
+
+                if ($repo->exists($username, $email)) {
+                    FlashMessage::warning('This user Already Exists');
+                } else {
+                    $status = $repo->insertUser($username, $password, $email, $fullname, $avatar);
+
+                    if ($status) {
+                        FlashMessage::success('This Member Was Added');
+                    } else {
+                        FlashMessage::error('Field Add User');
+                    }
+                }
+
+                URL::redirect('members');
+
+            }
+            
+            include BASE_PATH . '/Views/Pages/AddMember.php';
+        }
+
+       public function update() {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $errors = [];
+
+            if(empty($_POST['username']) || strlen($_POST['username']) < 10) {
+
+                $errors[] = "User Name Invalid";
+
+            }
+            if(empty($_POST['email'])) {
+
+                $errors[] = "Email Name Invalid";
+
+            }
+
+            if(!empty($errors)) {
+
+                foreach($errors as $error) {
+                    Alert::Print($error, 'error');
+                    return;
+                }
+
+
+            } else {
+
+                $this->Service->updateMember($_POST);
+
+            }
+
+
+
+            // URL::redirect('members?do=manage');
+
+        } else {
+
+            URL::redirect('404');
+
+        }
+    }
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Controllers/DashboardController.php
+==================================================
+<?php
+
+namespace Controllers;
+
+use Core\Database\DBConnection;
+use Core\Helper\Alert;
+use Core\Helper\URL;
+use Repositories\UserRepository;
+use Services\SessionsServices;
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+use Views\Layouts\Navbar;
+
+class DashboardController {
+    public function index() {
+        $session = new SessionsServices();
+        
+        $sessionStatus = $session->has('username');
+        if(!$sessionStatus) URL::redirect('login');
+        
+        $head = new Head('Dashboard', 'dashboard');
+        echo $head->Render();
+
+
+        echo (new Navbar())->Render();
+
+        include BASE_PATH . '/Views/Pages/Dashboard.php';
+
+        echo (new Footer('script', 'chart.umd.min'))->Render();
+
+        if ($session->has('username')) {
+            
+        } else {
+            echo "No session found, please login.";
+        }
+    }
+
+    public function getUsersWithDates() {
+
+        include BASE_PATH . "/APIs/getUsersWithDates.php";
+
+    }
+
+
+}
+?>
+
+
+==================================================
+=== FILE: ./Repositories/CategoryRepository.php
+==================================================
+<?php 
+
+    namespace Repositories;
+
+use Model\Category;
+use PDO;
+use Stringable;
+
+    class CategoryRepository {
+
+        private PDO $PDO;
+
+        public function __construct(PDO $pdo)
+        {
+            $this->PDO = $pdo;
+        }
+
+        public function showAllCategories() : array {
+
+            $SQL = "SELECT * FROM categories";
+
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
+
+        public function findById(int $id) : ?Category {
+
+             $SQL = 'SELECT * FROM categories WHERE ID = ?';
+
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([$id]);
+            $Data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+           if(empty($Data)) return null;
+
+            return new Category (
+                (int)$Data['ID'],
+                (string)$Data['Name'],
+                (string)$Data['Description'],
+                (int)$Data['Order'],
+                (int)$Data['Visibility'],
+                (int)$Data['Allow_Comment'],
+                (int)$Data['Allow_Ads'],
+
+            );
+        }
+        public function isExist(string $name) : bool {
+
+            $SQL = "SELECT COUNT(*) FROM categories WHERE Name = ? ";
+
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([$name]);
+
+            return (int) $stmt->fetchColumn() > 0;
+
+        }
+
+        public function insert(array $data) : bool {
+            
+            $SQL = "INSERT INTO `categories` (`Name`, `Description`, `Order`, `Visibility`, `Allow_Comment`, `Allow_Ads`)
+                            VALUES (:name, :description, :order, :visibility, :allow_comment, :allow_ads); ";
+
+            $stmt = $this->PDO->prepare($SQL);
+           return $stmt->execute([
+                ':name'             => $data['name'],
+                ':description'      => $data['description'],
+                ':order'            => $data['order'],
+                ':visibility'       => $data['visible'],
+                ':allow_comment'    => $data['comments'],
+                ':allow_ads'        => $data['ads']
+            ]);
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Repositories/UserRepository.php
+==================================================
+<?php
+
+    namespace Repositories;
+
+use DateTime;
+use Exception;
+use Model\User;
+    use PDO;
+
+    class UserRepository {
+
+        private PDO $PDO;
+
+        public function __construct(PDO $DB)
+        {
+            $this->PDO = $DB;
+        }
+
+        public function findById(int $id) : ?User {
+
+            $SQL = 'SELECT * FROM users WHERE UserID = ? LIMIT 1';
+
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([$id]);
+            $Data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if(empty($Data)) return null;
+
+                return new User(
+                    (int)$Data['UserID'],
+                    (string)$Data['Username'],
+                    (string)$Data['Password'],
+                    (string)$Data['Email'],
+                    (string)$Data['FullName'],
+                    (int)$Data['UserType'],
+                    (int)$Data['TrustStatus'],
+                    (int)$Data['RegStatus'],
+                    $Data['Date_Reg'],
+                    isset($Data['Avatar']) != null ? (string)$Data['Avatar'] : ''
+
+                );
+
+        }
+
+        public function findByUsername(string $username): ?User {
+        $stmt = $this->PDO->prepare("SELECT * FROM users WHERE Username = ?");
+        $stmt->execute([$username]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return null;
+        }
+
+        return new User(
+            (int)$data['UserID'],
+            (string)$data['Username'],
+            (string)$data['Password'],
+            (string)$data['Email'],
+            (string)$data['FullName'],
+            isset($data['UserType']) ? (int)$data['UserType'] : 0,
+            isset($data['TrustStatus']) ? (int)$data['TrustStatus'] : 0,
+            isset($data['RegStatus']) ? (int)$data['RegStatus'] : 0,
+            $data['Date_Reg'],
+            isset($data['Avatar']) ? (string)$data['Avatar'] : null
+        );
+    }
+
+    public function updateUser(int $id, string $username, string $password, string $email, string $fullname) : bool {
+
+        $SQL = "UPDATE users SET `Username` = ?, `Password` = ?, `Email` = ?, `FullName` = ? WHERE `UserID` = ?";
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([$username, $password, $email, $fullname, $id]);
+        $count = $stmt->rowCount();
+
+        if($count > 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    public function insertUser(string $username, string $password, string $email, string $fullname, ?string $avatar) : bool {
+
+       $SQL = "INSERT INTO users 
+                (`Username`, `Password`, `Email`, `FullName`, `UserType`, `TrustStatus`, `RegStatus`, `Date_Reg`, `Avatar`) 
+                VALUES (:username, :password, :email, :fullname, :usertype, :truststatus, :regstatus, :datereg, :avatar)";
+                
+        $success = false;
+
+            try {
+
+                $stmt = $this->PDO->prepare($SQL);
+                    $success = $stmt->execute([
+                    ':username'   => $username,
+                    ':password'   => $password,
+                    ':email'      => $email,
+                    ':fullname'   => $fullname,
+                    ':usertype'   => 0,
+                    ':truststatus'=> 0,
+                    ':regstatus'  => 0,
+                    ':datereg'    => date('Y-m-d H:i:s'),
+                    ':avatar'     => $avatar ?? null
+                ]);
+
+            } catch (\PDOException $error) {
+                throw new \Exception("Database Insert Failed: " . $error->getMessage());
+            }
+
+            return (bool)$success;
+
+
+    }
+
+    public function exists(string $username, string $email) : bool {
+
+        $SQL = "SELECT COUNT(*) FROM users WHERE Username = ? OR Email = ?";
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([
+            $username,
+            $email
+        ]);
+
+        return $stmt->fetchColumn() > 0;
+
+    }
+    public function getAllMembers($limit = "", $sort = "ASC") : array {
+
+            if(isset($limit)) {
+                $SQL = "SELECT * FROM users ORDER BY Username " . $sort . "LIMIT " . $limit;
+            } else {
+                $SQL = "SELECT * FROM users ORDER BY Username " . $sort;
+            }
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
+
+    public function deleteUser(int $id) : bool {
+
+        $SQL = 'DELETE FROM users WHERE `users`.`UserID` = ?';
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([$id]);
+
+        return $stmt->columnCount() > 0;
+
+    }
+
+    public function getUsersAndDates() : array {
+        $SQL = "SELECT YEAR(Date_Reg) AS year, COUNT(*) AS count FROM users GROUP BY year ORDER BY year";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $rows ?? [];
+    }
+
+    public function sumCountAllUsers() : int {
+        $SQL = "SELECT COUNT(Username) FROM users";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute();
+
+        return $stmt->columnCount() ?? 0;
+    }
+
+     public function getPendingUser() : array {
+        $SQL = "SELECT * FROM users WHERE RegStatus = ?";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([0]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $rows ?? [];
+    }
+
+    public function acceptUser($id) : bool {
+        $SQL = "UPDATE users SET RegStatus = 1 WHERE UserID = ?";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([$id]);
+        
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function countPendingMember() : int {
+        $SQL = "SELECT COUNT(Username) FROM users WHERE RegStatus = 0";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute();
+
+        return $stmt->rowCount() ?? 0;
+    }
+
+}
+
+
+

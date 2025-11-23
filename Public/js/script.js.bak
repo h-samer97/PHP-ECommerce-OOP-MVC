@@ -1,0 +1,111 @@
+window.onload = function() {
+
+    // alert()
+    const userInput = document.querySelector('.username');
+    const passwordInput = document.querySelector('.password');
+    var ulMenuUserParent = document.querySelector('.information-user');
+
+    const allInputFields = Array.from(document.querySelectorAll('input'));
+    const requiredFields = allInputFields.filter(input => input.required);
+
+  let navDropDownMenu = document.querySelector('.ndd-list'),
+        navDropDownMenuName = document.querySelector('.nav-drop-down > span');
+
+    navDropDownMenuName.addEventListener('click', () => {
+
+        navDropDownMenu.classList.toggle('show');
+
+    });
+
+   
+
+
+    const eyePasswordField = document.querySelector("#eye");
+        eyePasswordField.addEventListener("click", (e) => {
+
+            const Password = document.querySelector(".password");
+
+            if(Password.getAttribute("type") == "password") {
+               Password.setAttribute("type", "text");
+            }else if(Password.getAttribute("type") == "text") {
+                Password.setAttribute("type", "password");
+
+            }
+
+        });
+
+    // Dashboard
+
+var header_info = Array.from(document.querySelectorAll(".latest-info"));
+var icon        = document.querySelectorAll(".lt-pm");
+
+header_info.forEach((div, n) => {
+ div.onclick = function(){
+  
+
+    div.nextElementSibling.classList.toggle("animation");
+
+    if(icon[n].classList.contains("fa-plus")) {
+        icon[n].classList.add("fa-minus");
+        icon[n].classList.remove("fa-plus");
+    } else if(icon[n].classList.contains("fa-minus")) {
+        icon[n].classList.add("fa-plus");
+        icon[n].classList.remove("fa-minus");
+    }
+}
+});
+
+
+    requiredFields.forEach(input => {
+        const astrisk = document.createElement('span');
+        astrisk.textContent = "*";
+        astrisk.classList.add("astrisk");
+        input.insertAdjacentElement('afterend', astrisk);
+    });
+
+//     var burger = document.querySelector(".bars-menu");
+//             burger.addEventListener("click", () => {
+
+//     ulMenuUserParent.classList.toggle("state-mobi");
+
+// });
+
+togglePlaceholder(userInput);
+    togglePlaceholder(passwordInput);
+
+    function togglePlaceholder(input) {
+        const placeholderText = input.getAttribute('placeholder');
+        
+        input.addEventListener('focus', () => input.setAttribute("placeholder", ''));
+        input.addEventListener('blur', () => input.setAttribute("placeholder", placeholderText));
+    }
+
+
+    
+
+} // Onload Event
+
+
+window.addEventListener('DOMContentLoaded', () => {
+
+
+    document.querySelector('.load-icon').classList.add('load-icon-show');
+
+
+});
+
+
+function showLoader() {
+  document.getElementById("loader").style.display = "block";
+}
+
+ document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.delete-control').forEach(button => {
+        button.addEventListener('click', function(event) {
+            let status = confirm("Are You Sure?");
+            if (!status) {
+                event.preventDefault(); // منع الانتقال إذا ضغط Cancel
+            }
+        });
+    });
+});
