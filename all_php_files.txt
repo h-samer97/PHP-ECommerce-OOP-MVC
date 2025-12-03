@@ -103,8 +103,43 @@ use Views\Layouts\Head;
 
 
 ==================================================
+=== FILE: ./Views/Pages/test.php
+==================================================
+<?php
+include BASE_PATH . '/Core/Config/Config.php';
+
+$url = "https://api.exchangerateapi.net/v1/latest?base=USD";
+$headers = ["apikey: " . EXCHANGE_RATE_API_KEY];
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+$response = curl_exec($ch);
+unset($ch);
+
+$data = json_decode($response, true);
+
+if (isset($data['data']) && is_array($data['data'])) {
+    echo "<h3>Exchange Rates (Base USD)</h3><ul>";
+    foreach ($data['data'] as $currency => $info) {
+        echo "<li><strong>{$currency}</strong> → {$info['value']}</li>";
+    }
+    echo "</ul>";
+}
+
+if (isset($data['meta'])) {
+    echo "<p>Last updated: " . htmlspecialchars($data['meta']['last_updated_at']) . "</p>";
+}
+?>
+
+
+
+==================================================
 === FILE: ./Views/Pages/Dashboard.php
 ==================================================
+<?php include BASE_PATH . '/Views/Layouts/Sidebar.php' ?>
+<main>
+         <?php use Views\Layouts\Navbar; echo (new Navbar())->Render(); ?>
 <section class="dashboard-container">
         <div class="dashboard-stats">
 
@@ -123,17 +158,17 @@ use Views\Layouts\Head;
 
                 <!-- Charts -->
 
-                <div class="charts-row">
+               <div class="charts-row">
                         <div class="chart-box">
-                                <canvas class="charts" id="charts"></canvas>
-                                <canvas class="charts">
-                                        .......
-                                </canvas>
-                                <canvas class="charts">
-                                        ........
-                                </canvas>
+                        <h4>إحصائية تسجيل المستخدمين حسب السنة</h4>
+                        <canvas id="charts"></canvas>
                         </div>
-                </div> 
+                        <div class="chart-box">
+                        <h4>عدد العناصر حسب الفئة</h4>
+                        <canvas id="categoryChart"></canvas>
+                        </div>
+                        </div>
+
 
                 <div class="d-stats-info">
                         <div class="d-pie">
@@ -207,6 +242,7 @@ use Repositories\UserRepository;
         </div>
 
 </section>
+</main>
 
 
 ==================================================
@@ -274,6 +310,293 @@ use Views\Layouts\Head;
 
 
 ==================================================
+=== FILE: ./Views/Pages/Currencies/CurrDashboard.php
+==================================================
+<?php
+
+    use Views\Layouts\Head;
+    use Views\Layouts\Footer;
+
+    echo (new Head('Add Member', 'addMember'))->Render();
+?>
+
+    <div class="curr-main">
+
+        <div class="curr-nav">
+            <h3>converter</h3>
+
+            <div class="curr-nav-time">
+                <span class="curr-h">00</span>
+                <span class="curr-m">00</span>
+                <span class="curr-s">00</span>
+            </div>
+            <div class="curr-last-update">
+                last Update
+                <div class="clu-l">
+                    2010-01-01
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+<?php
+
+    echo (new Footer('script', 'chart.umd.min'))->Render();
+
+?>
+
+
+==================================================
+=== FILE: ./Views/Pages/Items/EditItem.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+ echo (new Head('Add Category', 'addMember'))->Render();
+
+?>
+<div class="form-card">
+  <h2><i class="fas fa-plus-circle"></i> Add New Item</h2>
+  <form method="POST" action="<?php echo BASE_URL . 'items/' . $row['Item_id'] . '/update' ?>">
+    <div class="form-group">
+      <label for="item-name">Name of The Item</label>
+      <div class="input-icon">
+        <i class="fas fa-tag"></i>
+        <input type="text" id="item-name" name="item-name" value="<?php echo $row['Item_name'] ?>" />
+        <input type="hidden" id="item-name" name="item-id" value="<?php echo $row['Item_id'] ?>" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-description">Description of The Item</label>
+      <div class="input-icon">
+        <i class="fas fa-align-left"></i>
+        <textarea id="item-description" name="item-description"><?php echo $row['Item_description'] ?>
+        </textarea>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-price">Price of The Item</label>
+      <div class="input-icon">
+        <i class="fas fa-dollar-sign"></i>
+        <input type="text" id="item-price" min="0" name="item-price" value="<?php echo $row['Price'] ?>"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-country">Country of Made </label>
+      <div class="input-icon">
+        <i class="fas fa-globe"></i>
+        <input type="text" id="item-country" name="item-country" value="<?php echo $row['Country_Made'] ?>" />
+      </div>
+    </div>
+
+    <div class="form-group">
+  <label for="item-status">Status</label>
+  <div class="input-icon">
+    <i class="fas fa-info-circle"></i>
+    <select id="item-status" name="item-status" required>
+      <option value="new" <?php echo ($row['Status_Item'] === 'new') ? 'selected' : ''; ?>>New</option>
+      <option value="used" <?php echo ($row['Status_Item'] === 'used') ? 'selected' : ''; ?>>Used</option>
+      <option value="refurbished" <?php echo ($row['Status_Item'] === 'refurbished') ? 'selected' : ''; ?>>Refurbished</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="item-rating">Rating</label>
+  <div class="input-icon">
+    <i class="fas fa-star"></i>
+    <select id="item-rating" name="item-rating">
+      <option value="0" <?php echo ($row['Rating'] == 0) ? 'selected' : ''; ?>>0 - No Rating</option>
+      <option value="1" <?php echo ($row['Rating'] == 1) ? 'selected' : ''; ?>>1 - Poor</option>
+      <option value="2" <?php echo ($row['Rating'] == 2) ? 'selected' : ''; ?>>2 - Fair</option>
+      <option value="3" <?php echo ($row['Rating'] == 3) ? 'selected' : ''; ?>>3 - Good</option>
+      <option value="4" <?php echo ($row['Rating'] == 4) ? 'selected' : ''; ?>>4 - Very Good</option>
+      <option value="5" <?php echo ($row['Rating'] == 5) ? 'selected' : ''; ?>>5 - Excellent</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="cat-id">Category</label>
+  <div class="input-icon">
+    <i class="fas fa-folder-open"></i>
+    <select id="cat-id" name="cat-id">
+      <option value="">Select Category</option>
+      <?php
+
+            foreach($Cats AS $Cat) {
+
+              echo '<option value='.$Cat['ID'].'>' . $Cat['Name'] . '</option>';
+
+            }
+
+      ?>
+      <!-- Add more categories dynamically from DB later -->
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="member-id">Member</label>
+  <div class="input-icon">
+    <i class="fas fa-user"></i>
+    <select id="member-id" name="member-id">
+      <option value="">Select Member</option>
+      
+             <?php
+
+            foreach($Members AS $Member) {
+
+              echo '<option value='.$Member['UserID'].'>' . $Member['Username'] . '</option>';
+
+            }
+
+      ?>
+
+    </select>
+  </div>
+</div>
+
+
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-edit"></i> Edit Item
+    </button>
+  </form>
+</div>
+
+
+
+==================================================
+=== FILE: ./Views/Pages/Items/AddItem.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+ echo (new Head('Add Category', 'addMember'))->Render();
+
+?>
+<div class="form-card">
+  <h2><i class="fas fa-plus-circle"></i> Add New Item</h2>
+  <form method="POST" action="">
+    <div class="form-group">
+      <label for="item-name">Name of The Item <span>*</span></label>
+      <div class="input-icon">
+        <i class="fas fa-tag"></i>
+        <input type="text" id="item-name" required name="item-name"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-description">Description of The Item <span>*</span></label>
+      <div class="input-icon">
+        <i class="fas fa-align-left"></i>
+        <textarea id="item-description" required name="item-description"></textarea>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-price">Price of The Item <span>*</span></label>
+      <div class="input-icon">
+        <i class="fas fa-dollar-sign"></i>
+        <input type="number" id="item-price" min="0" required name="item-price"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-country">Country of Made <span>*</span></label>
+      <div class="input-icon">
+        <i class="fas fa-globe"></i>
+        <input type="text" id="item-country" name="item-country" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="item-status">Status <span>*</span></label>
+      <div class="input-icon">
+        <i class="fas fa-info-circle"></i>
+        <select id="item-status" name="item-status" required>
+          <option value="new">New</option>
+          <option value="used">Used</option>
+          <option value="refurbished">Refurbished</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+  <label for="item-rating">Rating <span>*</span></label>
+  <div class="input-icon">
+    <i class="fas fa-star"></i>
+    <select id="item-rating" name="item-rating" required>
+      <option value="0">0 - No Rating</option>
+      <option value="1">1 - Poor</option>
+      <option value="2">2 - Fair</option>
+      <option value="3">3 - Good</option>
+      <option value="4">4 - Very Good</option>
+      <option value="5">5 - Excellent</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="cat-id">Category <span>*</span></label>
+  <div class="input-icon">
+    <i class="fas fa-folder-open"></i>
+    <select id="cat-id" name="cat-id" required>
+      <option value="">Select Category</option>
+      <?php
+
+            foreach($Cats AS $Cat) {
+
+              echo '<option value='.$Cat['ID'].'>' . $Cat['Name'] . '</option>';
+
+            }
+
+      ?>
+      <!-- Add more categories dynamically from DB later -->
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="member-id">Member <span>*</span></label>
+  <div class="input-icon">
+    <i class="fas fa-user"></i>
+    <select id="member-id" name="member-id" required>
+      <option value="">Select Member</option>
+      
+             <?php
+
+            foreach($Members AS $Member) {
+
+              echo '<option value='.$Member['UserID'].'>' . $Member['Username'] . '</option>';
+
+            }
+
+      ?>
+
+    </select>
+  </div>
+</div>
+
+
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-plus"></i> Add Item
+    </button>
+  </form>
+</div>
+
+
+
+==================================================
 === FILE: ./Views/Pages/Categories/ShowCategories.php
 ==================================================
 <?php
@@ -292,9 +615,17 @@ use Views\Layouts\Head;
                   foreach($rows as $row) {
                     echo '<div class="cat-section">';
                     echo '<h4>' . $row['Name'] . '</h4>';
-                        echo '<a href=\'category/edit\'>edit</a>' . '<a href=\'category/delete\'>delete</a>';
+                        echo '<a href="categories/' . $row['ID'] . '/edit">edit</a> <a href="categories/' . $row['ID'] . '/delete">delete</a>';
                     echo '<div class="cat">';
-                    echo '<img src="' . URL::ico('404') . '" alt="">';
+                   
+                    foreach($items as $item) {
+
+                        if($row['ID'] == $item['ICI']) {
+                            echo '<div>' . $item['Name'] . '</div>';
+                        }
+
+                    }
+
                     echo '<p>'. $row['Description'] .'</p>';
                     echo '<div class="cat-config">';
                         echo $row['Order'];
@@ -308,7 +639,7 @@ use Views\Layouts\Head;
 
                   }      
         
-                ?>
+        ?>
         </div>
 
     </main>
@@ -422,6 +753,107 @@ use Views\Layouts\Head;
 
 
 ==================================================
+=== FILE: ./Views/Pages/Categories/EditCategory.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+ echo (new Head('Add Category', 'addMember'))->Render();
+
+?>
+<form class="container" method="POST" action="<?php echo BASE_URL . 'categories/' . $rows->ID . '/update' ?>">
+<div class="card">
+  <div class="card-header">
+    <h2>Edit Category</h2>
+  </div>
+  <!-- ضع العناصر التالية داخل هذه البطاقة -->
+</div>
+<div class="field">
+  <label class="label">
+    Category Name
+    <span class="req" aria-hidden="true">*</span>
+  </label>
+  <input type="text" class="input" placeholder="" name="name" value="<?php echo $rows->Name ?>">
+  <input type="hidden" name="id" value="<?php echo $rows->ID ?>">
+</div>
+<div class="field">
+  <label class="label">Description Category</label>
+  <textarea class="textarea" rows="3" placeholder="Describe" name="description">
+    <?php echo $rows->Description ?></textarea>
+</div>
+<div class="field">
+  <label class="label">Sort</label>
+  <div class="number-wrap">
+    <input type="number" class="input number-input" min="0" step="1" placeholder="ex: 10" name="order" value="<?php echo $rows->Order ?>">
+    <span class="suffix">#</span>
+  </div>
+
+</div>
+<div class="field">
+  <label class="label">Visibility</label>
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="visible" value="1" <?php if($rows->Visibility == 1) echo 'checked' ?>>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">Yes</span>
+    </label>
+    <label class="radio-item">
+      <input type="radio" name="visible" value="0" <?php if($rows->Visibility == 0) echo 'checked' ?>>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">No</span>
+    </label>
+  </div>
+</div>
+
+<div class="field">
+  <label class="label">Allow Comments </label>
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="comments" value="1" <?php if($rows->Allow_Comment == 1) echo 'checked' ?>>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">Yes</span>
+    </label>
+    <label class="radio-item">
+      <input type="radio" name="comments" value="0" <?php if($rows->Allow_Comment == 0) echo 'checked' ?>>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">No</span>
+    </label>
+  </div>
+</div>
+
+<div class="field">
+  <label class="label">Allow Ads </label>
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="ads" value="1" <?php if($rows->Allow_Ads == 1) echo 'checked' ?>>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">Yes</span>
+    </label>
+    <label class="radio-item">
+      <input type="radio" name="ads" value="0" <?php if($rows->Allow_Ads == 0) echo 'checked' ?>>
+      <span class="switch"><span class="dot"></span></span>
+      <span class="text">No</span>
+    </label>
+  </div>
+</div>
+<div class="actions">
+  <button type="submit" class="btn-primary">
+    Update Category
+  </button>
+</div>
+</form>
+<?php 
+
+
+    echo (new Footer('script', 'chart.umd.min'))->Render();
+
+
+?>
+
+
+==================================================
 === FILE: ./Views/Layouts/Footer.php
 ==================================================
 <?php
@@ -448,7 +880,7 @@ use Core\Interfaces\ILayouts;
             return <<< HTML
             </body>
                 <script src="{$this->charts}"></script>
-                <script src="{$this->js}"></script>
+                <script src="{$this->js}" type="module"></script>
             </html>
             HTML;    
         }
@@ -604,6 +1036,35 @@ use Services\LanguageLoader;
 
 
 ==================================================
+=== FILE: ./Views/Layouts/Sidebar.php
+==================================================
+<?php
+
+    use Core\Helper\URL;
+use Services\LanguageLoader;
+use Views\Layouts\Footer;
+    use Views\Layouts\Head;
+    echo (new Head('404', '404'))->Render();
+
+?>
+<aside>
+    <i class="fa fa-bars side-br"></i>
+    <span> <i class="fa fa-shopping-cart"></i> Ecomm</span>
+    <ul class="side-list">
+        <li class="active"><i class="fa fa-home"></i><a href="">Home</a></li>
+        <li><i class="fa fa-home"></i><a href="/dashboard"><span><?php echo LanguageLoader::getKeyword('home') ?></span></a></li>
+        <li><i class="fa fa-home"></i><a href="categories"><span><?php echo LanguageLoader::getKeyword('categories') ?></span></a></li>
+        <li><i class="fa fa-home"></i><a href="memebrs"><span><?php echo LanguageLoader::getKeyword('members') ?></span></a></li>
+        <li><i class="fa fa-home"></i><a href=""><span><?php echo LanguageLoader::getKeyword('logs') ?></span></a></li>
+        <li><i class="fa fa-home"></i><a href="logout"><span><?php echo LanguageLoader::getKeyword('logout') ?></span></a></li>
+    </ul>
+    <a href="/logout">logout</a>
+</aside>
+
+<?php echo (new Footer('script', 'echarts.min'))->Render(); ?>
+
+
+==================================================
 === FILE: ./Views/Components/LoadingIcon.php
 ==================================================
 <?php
@@ -660,6 +1121,7 @@ require_once __DIR__ . '/../Core/Router/Router.php';
 use Controllers\AuthController;
 use Controllers\CategoriesController;
 use Controllers\DashboardController;
+use Controllers\ItemController;
 use Controllers\MembersController;
 use Core\Helper\URL;
 use Core\Router\Router;
@@ -739,6 +1201,20 @@ $router->add('api/getUsersWithDates', function() {
 
 });
 
+$router->add('api/getCats', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getCats();
+
+});
+
+$router->add('api/getCountryMade', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getCountryMade();
+
+});
+
 $router->add('members/insert', function() {
     $members = new MembersController();
     $members->insert();
@@ -755,6 +1231,49 @@ $router->add('categories/add', function() {
     $categories->insert();
 });
 
+$router->add('categories/{id}/edit', function($id) {
+    $categories = new CategoriesController();
+    $categories->edit($id);
+});
+
+$router->add('categories/{id}/update', function($id) {
+    $categories = new CategoriesController();
+    $categories->update($id);
+});
+
+$router->add('categories/{id}/delete', function($id) {
+    $categories = new CategoriesController();
+    $categories->delete($id);
+});
+
+$router->add('items/insert', function() {
+    $item = new ItemController();
+    $item->insert();
+});
+
+$router->add('items/{id}/edit', function($id) {
+    $item = new ItemController();
+    $item->edit($id);
+});
+
+$router->add('items/{id}/update', function($id) {
+    $item = new ItemController();
+    $item->update($id);
+});
+
+$router->add('items/{id}/delete', function($id) {
+    $item = new ItemController();
+    $item->delete($id);
+});
+
+$router->add('items/{id}/delete', function($id) {
+    $item = new ItemController();
+    $item->delete($id);
+});
+
+$router->add('test', function() {
+        include BASE_PATH . '/Views/Layouts/Sidebar.php';
+});
 
 
 /**
@@ -767,6 +1286,24 @@ $router->add('404', function() {
 // تنفيذ التوجيه
 $router->dispatch();
 
+
+
+==================================================
+=== FILE: ./APIs/getItemsCountWithCats.php
+==================================================
+<?php 
+
+    namespace APIs;
+    use Repositories\UserRepository;
+    use Core\Database\DBConnection;
+    use Repositories\ItemRepository;
+
+    $repo = new ItemRepository( ( new DBConnection() )->getConnection() );
+        $records = $repo->getItemWithCatsAnalisys();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($records, JSON_UNESCAPED_UNICODE);
+
+?>
 
 
 ==================================================
@@ -783,7 +1320,25 @@ $router->dispatch();
 
     $repo = new UserRepository( ( new DBConnection() )->getConnection() );
         $records = $repo->getUsersAndDates();
-        // header('Content-Type: application/json; charset=utf-8');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($records, JSON_UNESCAPED_UNICODE);
+
+?>
+
+
+==================================================
+=== FILE: ./APIs/getCountryMadeAPI.php
+==================================================
+<?php 
+
+    namespace APIs;
+    use Repositories\UserRepository;
+    use Core\Database\DBConnection;
+    use Repositories\ItemRepository;
+
+    $repo = new ItemRepository( ( new DBConnection() )->getConnection() );
+        $records = $repo->getCountryMadeAPI();
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($records, JSON_UNESCAPED_UNICODE);
 
 ?>
@@ -839,6 +1394,9 @@ error_reporting(E_ALL);
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
 }
+// config.php
+define("EXCHANGE_RATE_API_KEY", "c220843c-7d3d-45e2-975d-574cdd4b12fc");
+
 
 // BASE_URL
 if (!defined('BASE_URL')) {
@@ -1234,7 +1792,7 @@ abstract class AbstractDBConnection {
 
         public static function getKeyword($key) : string {
 
-            return self::$language[$key];
+            return self::$language[$key] ?? 'def';
 
         }
 
@@ -1692,6 +2250,49 @@ use Repositories\CategoryRepository;
 
 
 ==================================================
+=== FILE: ./Services/CurrencyAPIService.php
+==================================================
+
+
+
+==================================================
+=== FILE: ./Services/ValidationService.php
+==================================================
+<?php
+
+namespace Services;
+
+class ValidationService {
+
+    public static function isValidItemName(string $name): bool {
+        // اسم المنتج: حروف + أرقام + مسافات، من 3 إلى 50 حرف
+        return preg_match("/^[a-zA-Z0-9\s]{3,50}$/", $name);
+    }
+
+    public static function isValidDescription(string $desc): bool {
+        // الوصف: على الأقل 10 أحرف، يسمح بالحروف والأرقام وبعض الرموز
+        return preg_match("/^[a-zA-Z0-9\s\.,!?]{10,}$/", $desc);
+    }
+
+    public static function isValidPrice($price): bool {
+        // السعر: رقم صحيح أو عشري بحد أقصى منزلتين عشريتين
+        return preg_match("/^\d+(\.\d{1,2})?$/", $price);
+    }
+
+    public static function isValidCountry(string $country): bool {
+        // البلد: حروف فقط، من 2 إلى 30 حرف
+        return preg_match("/^[a-zA-Z\s]{2,30}$/", $country);
+    }
+
+    public static function isValidRating($rating): bool {
+        // التقييم: رقم من 0 إلى 5
+        return preg_match("/^[0-5]$/", $rating);
+    }
+}
+
+
+
+==================================================
 === FILE: ./Services/LanguageLoader.php
 ==================================================
 <?php
@@ -1789,7 +2390,9 @@ use Core\Helper\FlashMessage;
 use Core\Helper\URL;
 use Model\Category;
 use Repositories\CategoryRepository;
+use Repositories\ItemRepository;
 use Services\SessionsServices;
+use Exception;
 
 class CategoriesController {
 
@@ -1809,7 +2412,10 @@ class CategoriesController {
         FlashMessage::display();
 
         $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
-        $rows = $repo->showAllCategories();
+        $rows = $repo->showAllCategories('DESC');
+
+        $repoItem = new ItemRepository();
+        $items = $repoItem->getItemFromCategories();
 
         include BASE_PATH . '/Views/Pages/Categories/ShowCategories.php';
     }
@@ -1852,6 +2458,59 @@ class CategoriesController {
         }
         include BASE_PATH . '/Views/Pages/Categories/AddCategory.php';
     }
+
+    public function edit($id) {
+
+        $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+        $rows = $repo->findById($id);
+
+        include BASE_PATH . '/Views/Pages/Categories/EditCategory.php';
+
+
+
+    }
+
+    public function update($id) {
+        
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
+             $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+
+                if($repo->isExist($_POST['name'])) {
+                    FlashMessage::init();
+                    FlashMessage::warning('This Category Already Exists');
+                    FlashMessage::display();
+                    echo 'Samer 404';
+                } else {
+
+                    $repo->update($_POST);
+                    echo true;
+                }
+
+
+        }
+
+    }
+
+        public function delete($id) {
+            try {
+                $repo = new CategoryRepository();
+
+                if ($repo->delete($id)) {
+                    FlashMessage::init();
+                    FlashMessage::success('Category deleted successfully!');
+                    URL::redirect('categories');
+                } else {
+                    FlashMessage::init();
+                    FlashMessage::error('Failed to delete category.');
+                    URL::redirect('categories');
+                }
+            } catch (Exception $e) {
+                FlashMessage::init();
+                FlashMessage::error('Error: ' . $e->getMessage());
+                URL::redirect('categories');
+            }
+        }
 
 }
 
@@ -2058,6 +2717,171 @@ use Soap\Url as SoapUrl;
 
 
 ==================================================
+=== FILE: ./Controllers/ItemController.php
+==================================================
+<?php
+
+
+    namespace Controllers;
+
+use Core\Helper\Alert;
+use Core\Helper\FlashMessage;
+use Core\Helper\URL as HelperURL;
+use Repositories\ItemRepository;
+use Services\SessionsServices;
+use Core\Helper\URL;
+use Repositories\CategoryRepository;
+use Repositories\UserRepository;
+use Soap\Url as SoapUrl;
+
+    class ItemController {
+
+        public function __construct()
+        {
+            new SessionsServices();
+        }
+
+        public function insert() {
+            
+            $repo = new ItemRepository();
+            $Cats = $repo->getCategoriesNameAID();
+            $Members = $repo->getUsersWithID();
+
+            if($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+                $required = ['item-name', 'item-description', 'item-price', 'item-country', 'item-status', 'item-rating', 'cat-id', 'member-id'];
+
+                foreach($required as $req) {
+                    if(empty($_POST[$req])) {
+                        FlashMessage::init();
+                        FlashMessage::error('Please Fill all Fields');
+                        exit;
+                    }
+                }
+
+                    $itemName = trim($_POST['item-name']);
+                    $itemDescription = trim($_POST['item-description']);
+                    $itemPrice = (float) $_POST['item-price'];
+                    $itemCountry = trim($_POST['item-country']);
+                    $itemStatus = (int) $_POST['item-status'];
+                    $itemRating = (int) $_POST['item-rating'];
+                    $catId = (int) $_POST['cat-id'];
+                    $memberId = (int) $_POST['member-id'];
+
+                if(!is_numeric($_POST['item-price']) or $_POST['item-price'] < 0) {
+                    Alert::Print('invalid price');
+                    exit;
+                }
+
+                 $repo = new ItemRepository();
+                $status = $repo->insert($itemName, $itemDescription, $itemPrice, $itemCountry, $itemStatus, $itemRating, $catId, $memberId);
+
+                if($status) {
+                    FlashMessage::init();
+                    FlashMessage::success('the item was inserted');
+                    FlashMessage::display();
+                    URL::redirect('items');
+                    exit;
+                }
+
+                }
+
+            include BASE_PATH . '/Views/Pages/Items/AddItem.php';
+
+        }
+
+        public function edit($id) {
+
+            $repo = new ItemRepository();
+            $row = $repo->findById($id);
+
+            $repo2 = new CategoryRepository();
+            $Cats = $repo2->showAllCategories();
+
+            $repo3 = new UserRepository();
+            $Members = $repo3->getAllMembers();
+
+            include BASE_PATH . '/Views/Pages/Items/EditItem.php';
+
+        }
+
+        public function update() {
+
+            if($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+                 $itemName = trim($_POST['item-name']);
+                    $itemDescription = trim($_POST['item-description']);
+                    $itemPrice = (float) $_POST['item-price'];
+                    $itemCountry = trim($_POST['item-country']);
+                    $itemStatus = (int) $_POST['item-status'];
+                    $itemRating = (int) $_POST['item-rating'];
+                    $catId = (int) $_POST['cat-id'];
+                    $memberId = (int) $_POST['member-id'];
+
+                    // read the item id (expected from a hidden input in the edit form)
+                    $itemId = isset($_POST['item-id']) ? (int) $_POST['item-id'] : 0;
+
+                if(!is_numeric($_POST['item-price']) or $_POST['item-price'] < 0) {
+                    Alert::Print('invalid price');
+                    exit;
+                }
+
+                $repo = new ItemRepository();
+                $status = $repo->update($itemId, $itemName, $itemDescription, $itemPrice, $itemCountry, $itemStatus, $itemRating, $catId, $memberId);
+
+                if($status) {
+
+                    FlashMessage::init();
+                    FlashMessage::success('this item had Updated!');
+                    FlashMessage::display();
+                    URL::redirect('items');
+
+                }
+
+            }
+
+        }
+
+        public function delete($id) {
+
+            $repo = new ItemRepository();
+            $repo->delete($id);
+
+            FlashMessage::init();
+            FlashMessage::success('item had deleted');
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
 === FILE: ./Controllers/DashboardController.php
 ==================================================
 <?php
@@ -2084,8 +2908,6 @@ class DashboardController {
         echo $head->Render();
 
 
-        echo (new Navbar())->Render();
-
         include BASE_PATH . '/Views/Pages/Dashboard.php';
 
         echo (new Footer('script', 'chart.umd.min'))->Render();
@@ -2103,6 +2925,18 @@ class DashboardController {
 
     }
 
+    public function getCats() {
+
+        include BASE_PATH . '/APIs/getItemsCountWithCats.php';
+
+    }
+
+    public function getCountryMade() {
+
+        include BASE_PATH . '/APIs/getCountryMadeAPI.php';
+
+    }
+
 
 }
 ?>
@@ -2115,6 +2949,7 @@ class DashboardController {
 
     namespace Repositories;
 
+use Core\Database\DBConnection;
 use Model\Category;
 use PDO;
 use Stringable;
@@ -2123,14 +2958,21 @@ use Stringable;
 
         private PDO $PDO;
 
-        public function __construct(PDO $pdo)
+        public function __construct(?PDO $pdo = null)
         {
-            $this->PDO = $pdo;
+            $this->PDO = $pdo ?? (new DBConnection())->getConnection();
         }
 
-        public function showAllCategories() : array {
+        public function showAllCategories(string $sort = 'ASC') : array {
 
-            $SQL = "SELECT * FROM categories";
+            if($sort == 'DESC') {
+            $SQL = 'SELECT * FROM categories ORDER BY `Order` ' . $sort;
+            } else {
+
+                $SQL = "SELECT * FROM categories";
+
+            }
+
 
             $stmt = $this->PDO->prepare($SQL);
             $stmt->execute();
@@ -2171,6 +3013,30 @@ use Stringable;
 
         }
 
+        public function update(array $data) : bool {
+
+             $SQL = "UPDATE categories SET 
+                `Name` = :name, 
+                `Description` = :description, 
+                `Order` = :order, 
+                `Visibility` = :visibility, 
+                `Allow_Comment` = :allow_comment, 
+                `Allow_Ads` = :allow_ads 
+                WHERE `ID` = :id";
+            
+            $stmt = $this->PDO->prepare($SQL);
+            return $stmt->execute([
+                ':name'           => $data['name'],
+                ':description'    => $data['description'],
+                ':order'          => $data['order'],
+                ':visibility'     => $data['visible'],
+                ':allow_comment'  => $data['comments'],
+                ':allow_ads'      => $data['ads'],
+                ':id'             => $data['id']
+            ]);
+
+        }
+
         public function insert(array $data) : bool {
             
             $SQL = "INSERT INTO `categories` (`Name`, `Description`, `Order`, `Visibility`, `Allow_Comment`, `Allow_Ads`)
@@ -2187,6 +3053,19 @@ use Stringable;
             ]);
 
         }
+
+        public function delete($id) : bool {
+
+            $SQL = "DELETE FROM categories WHERE `categories`.`ID` = ?";
+
+             $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([$id]);
+
+            return (int) $stmt->rowCount() > 0;
+
+        }
+
+        
 
     }
 
@@ -2207,12 +3086,196 @@ use Stringable;
 
 
 ==================================================
+=== FILE: ./Repositories/ItemRepository.php
+==================================================
+<?php
+
+namespace Repositories;
+
+use Core\Database\DBConnection;
+use Core\Helper\Alert;
+use PDO;
+use PDOException;
+
+class ItemRepository
+{
+    private PDO $pdo;
+
+    public function __construct(?PDO $pdo = null)
+    {
+        $this->pdo = $pdo ?? (new DBConnection())->getConnection();
+    }
+
+   public function insert(string $name, string $description, int $price, string $country, int $status, int $rating, int $cat_id, int $member_id, ?string $image = null, int $approve = 0): bool {
+    try {
+        $SQL = "INSERT INTO `items` 
+                (`Item_name`, `Item_description`, `Price`, `Add_Date`, `Country_Made`, `Image`, `Status_Item`, `Rating`, `Cat_ID`, `Member_ID`, `Approve`)
+                VALUES (:name, :description, :price, NOW(), :country, :image, :status, :rating, :cat_id, :member_id, :approve)";
+
+        $stmt = $this->pdo->prepare($SQL);
+
+        // Bind parameters
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+        $stmt->bindParam(':price', $price, PDO::PARAM_INT);
+        $stmt->bindParam(':country', $country, PDO::PARAM_STR);
+        if ($image === null) {
+            $stmt->bindValue(':image', null, PDO::PARAM_NULL);
+        } else {
+            $stmt->bindParam(':image', $image, PDO::PARAM_STR);
+        }
+        $stmt->bindParam(':status', $status, PDO::PARAM_INT);
+        $stmt->bindParam(':rating', $rating, PDO::PARAM_INT);
+        $stmt->bindParam(':cat_id', $cat_id, PDO::PARAM_INT);
+        $stmt->bindParam(':member_id', $member_id, PDO::PARAM_INT);
+        $stmt->bindParam(':approve', $approve, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    } catch (PDOException $e) {
+        Alert::Print($e->getMessage());
+        return false;
+    }
+}
+
+
+
+    public function getCategoriesNameAID() : ?array {
+
+        $SQL = "SELECT categories.Name, categories.ID FROM categories";
+        $stmt = $this->pdo->prepare($SQL);
+        $stmt->execute([]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? null;
+
+    }
+
+    public function getUsersWithID() : ?array {
+
+        $SQL = "SELECT users.Username, users.UserID FROM users";
+        $stmt = $this->pdo->prepare($SQL);
+        $stmt->execute([]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? null;
+
+    }
+
+    public function findById($id) {
+
+        $SQL = "SELECT * FROM items WHERE Item_id = ?";
+        $stmt = $this->pdo->prepare($SQL);
+        $stmt->execute([$id]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?? [];
+
+    }
+
+
+    public function getItemFromCategories() {
+
+        $SQL = "SELECT items.Item_name AS Name, categories.Name AS `Cat Name`, items.Cat_ID AS ICI, categories.ID AS CID FROM items
+                INNER JOIN categories ON categories.ID = items.Cat_ID";
+
+        $stmt = $this->pdo->prepare($SQL);
+        $stmt->execute([]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? null;
+
+
+    }
+
+                    public function update(
+                    int $id,
+                    string $name,
+                    string $description,
+                    float $price,
+                    string $country,
+                    int $status,
+                    int $rating,
+                    int $catid,
+                    int $memberid
+                ) : bool {
+
+                    $SQL = "UPDATE `items` 
+                            SET `Item_name` = ?, 
+                                `Item_description` = ?, 
+                                `Price` = ?, 
+                                `Country_Made` = ?, 
+                                `Status_Item` = ?, 
+                                `Rating` = ?, 
+                                `Cat_ID` = ?, 
+                                `Member_ID` = ?, 
+                                `Approve` = 1
+                            WHERE `Item_id` = ?";
+
+                    $stmt = $this->pdo->prepare($SQL);
+
+                    return $stmt->execute([
+                        $name,
+                        $description,
+                        $price,
+                        $country,
+                        $status,
+                        $rating,
+                        $catid,
+                        $memberid,
+                        $id
+                    ]);
+                }
+
+
+            public function delete($id) : bool {
+
+                $SQL = "DELETE FROM items WHERE `Item_id` = ?";
+
+                $stmt = $this->pdo->prepare($SQL);
+                $stmt->execute([$id]);
+
+            return (int) $stmt->rowCount() > 0;
+
+        }
+
+        public function getItemWithCatsAnalisys() : ?array {
+
+            $SQL = "SELECT categories.Name, COUNT(items.Item_id) AS ItemCount
+                    FROM items
+                    JOIN categories ON items.Cat_ID = categories.ID
+                    GROUP BY categories.Name;
+                    ";
+
+                $stmt = $this->pdo->prepare($SQL);
+                $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
+
+        public function getCountryMadeAPI() : ?array {
+
+            $SQL = "SELECT Country_Made, COUNT(*) AS ItemCount
+                    FROM items
+                    GROUP BY Country_Made
+                    ORDER BY ItemCount DESC;
+                    ";
+            $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
+
+
+
+}
+
+
+==================================================
 === FILE: ./Repositories/UserRepository.php
 ==================================================
 <?php
 
     namespace Repositories;
 
+use Core\Database\DBConnection;
 use DateTime;
 use Exception;
 use Model\User;
@@ -2222,9 +3285,9 @@ use Model\User;
 
         private PDO $PDO;
 
-        public function __construct(PDO $DB)
+        public function __construct(PDO $DB = null)
         {
-            $this->PDO = $DB;
+            $this->PDO = (new DBConnection())->getConnection();
         }
 
         public function findById(int $id) : ?User {
@@ -2336,19 +3399,25 @@ use Model\User;
         return $stmt->fetchColumn() > 0;
 
     }
-    public function getAllMembers($limit = "", $sort = "ASC") : array {
+    public function getAllMembers($limit = null, $sort = "ASC") : array {
 
-            if(isset($limit)) {
-                $SQL = "SELECT * FROM users ORDER BY Username " . $sort . "LIMIT " . $limit;
-            } else {
-                $SQL = "SELECT * FROM users ORDER BY Username " . $sort;
-            }
-            $stmt = $this->PDO->prepare($SQL);
-            $stmt->execute();
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sort = strtoupper($sort) === "DESC" ? "DESC" : "ASC";
 
+    $SQL = "SELECT * FROM users ORDER BY Username $sort";
+    if (!empty($limit)) {
+        $SQL .= " LIMIT :limit";
     }
+
+    $stmt = $this->PDO->prepare($SQL);
+
+    if (!empty($limit)) {
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    }
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 
     public function deleteUser(int $id) : bool {
@@ -2377,7 +3446,7 @@ use Model\User;
         $stmt = $this->PDO->prepare($SQL);
         $stmt->execute();
 
-        return $stmt->columnCount() ?? 0;
+        return $stmt->fetchColumn() ?? 0;
     }
 
      public function getPendingUser() : array {

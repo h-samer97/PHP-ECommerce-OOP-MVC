@@ -1,8 +1,119 @@
-import API from "./chartsAPI.js";
+export default class API {
+
+    constructor() {
+
+        this.api = new API();
+
+    }
+
+    renderUsersDatesChart() {
+                    fetch('/api/getUsersWithDates')
+            .then(res => res.json())
+            .then(rows => {
+                const labels = rows.map(r => r.year);         // السنوات
+                const data = rows.map(r => Number(r.count));  // عدد المستخدمين
+
+                const ctx = document.getElementById('charts').getContext('2d');
+                new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                    label: 'عدد المستخدمين لكل سنة',
+                    data,
+                    backgroundColor: 'rgba(0, 54, 90, 0.5)',
+                    borderColor: 'rgba(0, 102, 170, 1)',
+                    borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                    title: {
+                        display: true,
+                        text: 'إحصائية تسجيل المستخدمين حسب السنة'
+                    }
+                    },
+                    scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                    }
+                }
+                });
+            });
+
+        }
+
+        renderCatsAPI() {
+                fetch('api/getCats')
+                    .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                    })
+                    .then(data => {
+                    if (!Array.isArray(data) || data.length === 0) {
+                        console.warn("No data available for chart.");
+                        return;
+                    }
+
+                    const labels = data.map(item => item.Name);
+                    const counts = data.map(item => item.ItemCount);
+
+                    const ctx = document.getElementById('categoryChart').getContext('2d');
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'عدد العناصر حسب الفئة',
+                            data: counts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                        },
+                        options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'عدد العناصر'
+                            }
+                            },
+                            x: {
+                            title: {
+                                display: true,
+                                text: 'الفئة'
+                            }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                            display: true,
+                            text: 'إحصائية عدد العناصر حسب الفئة'
+                            }
+                        }
+                        }
+                    });
+                    })
+                    .catch(error => {
+                    console.error("Error rendering chart:", error);
+                    });
+        }
+
+}import API from "./chartsAPI";
 
 
 
 class AppUI {
+
+
+    
 
     constructor() {
         // عناصر الإدخال
@@ -28,11 +139,11 @@ class AppUI {
         // عناصر الحذف
         this.deleteButtons = document.querySelectorAll('.delete-control');
 
-        this.burgerSideBar = document.querySelector('.side-br') ?? null;
+        this.burgerSideBar = document.querySelector('.side-br');
 
         this.aside = document.querySelector('aside');
 
-        this.api = new API();
+        new API();
     }
 
     init() {
@@ -44,10 +155,10 @@ class AppUI {
         this.togglePlaceholder(this.passwordInput);
         this.confirmDelete();
         this.showLoaderOnLoad();
-        // this.toggleSideBarStatus();
-        this.api.renderCatsAPI();
-        this.api.renderUsersDatesChart();
-        this.api.searchBox();
+        this.renderUsersDatesChart();
+        this.toggleSideBarStatus();
+        this.renderCatsAPI();
+        API.renderCatsAPI();
     }
 
     toggleNavMenu() {

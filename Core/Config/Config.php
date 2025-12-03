@@ -7,6 +7,9 @@ error_reporting(E_ALL);
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
 }
+// config.php
+define("EXCHANGE_RATE_API_KEY", "c220843c-7d3d-45e2-975d-574cdd4b12fc");
+
 
 // BASE_URL
 if (!defined('BASE_URL')) {

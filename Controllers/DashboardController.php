@@ -22,8 +22,6 @@ class DashboardController {
         echo $head->Render();
 
 
-        echo (new Navbar())->Render();
-
         include BASE_PATH . '/Views/Pages/Dashboard.php';
 
         echo (new Footer('script', 'chart.umd.min'))->Render();
@@ -35,9 +33,27 @@ class DashboardController {
         }
     }
 
+    public function searchBox() {
+
+        include BASE_PATH . '/APIs/searchResulte.php';
+
+    }
+
     public function getUsersWithDates() {
 
         include BASE_PATH . "/APIs/getUsersWithDates.php";
+
+    }
+
+    public function getCats() {
+
+        include BASE_PATH . '/APIs/getItemsCountWithCats.php';
+
+    }
+
+    public function getCountryMade() {
+
+        include BASE_PATH . '/APIs/getCountryMadeAPI.php';
 
     }
 

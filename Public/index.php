@@ -9,6 +9,7 @@ require_once __DIR__ . '/../Core/Router/Router.php';
 use Controllers\AuthController;
 use Controllers\CategoriesController;
 use Controllers\DashboardController;
+use Controllers\ItemController;
 use Controllers\MembersController;
 use Core\Helper\URL;
 use Core\Router\Router;
@@ -88,13 +89,34 @@ $router->add('api/getUsersWithDates', function() {
 
 });
 
+$router->add('api/getCats', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getCats();
+
+});
+
+$router->add('api/getCountryMade', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getCountryMade();
+
+});
+
+$router->add('api/searchData', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->searchBox();
+
+});
+
 $router->add('members/insert', function() {
     $members = new MembersController();
     $members->insert();
 });
 
 
-$router->add('categories', function($id) {
+$router->add('categories', function() {
     $categories = new CategoriesController();
     $categories->index();
 });
@@ -104,6 +126,49 @@ $router->add('categories/add', function() {
     $categories->insert();
 });
 
+$router->add('categories/{id}/edit', function($id) {
+    $categories = new CategoriesController();
+    $categories->edit($id);
+});
+
+$router->add('categories/{id}/update', function($id) {
+    $categories = new CategoriesController();
+    $categories->update($id);
+});
+
+$router->add('categories/{id}/delete', function($id) {
+    $categories = new CategoriesController();
+    $categories->delete($id);
+});
+
+$router->add('items/insert', function() {
+    $item = new ItemController();
+    $item->insert();
+});
+
+$router->add('items/{id}/edit', function($id) {
+    $item = new ItemController();
+    $item->edit($id);
+});
+
+$router->add('items/{id}/update', function($id) {
+    $item = new ItemController();
+    $item->update($id);
+});
+
+$router->add('items/{id}/delete', function($id) {
+    $item = new ItemController();
+    $item->delete($id);
+});
+
+$router->add('items/{id}/delete', function($id) {
+    $item = new ItemController();
+    $item->delete($id);
+});
+
+$router->add('test', function() {
+        include BASE_PATH . '/Views/Layouts/Sidebar.php';
+});
 
 
 /**

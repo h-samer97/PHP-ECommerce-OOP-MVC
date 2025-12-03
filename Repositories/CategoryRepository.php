@@ -2,6 +2,7 @@
 
     namespace Repositories;
 
+use Core\Database\DBConnection;
 use Model\Category;
 use PDO;
 use Stringable;
@@ -10,9 +11,9 @@ use Stringable;
 
         private PDO $PDO;
 
-        public function __construct(PDO $pdo)
+        public function __construct(?PDO $pdo = null)
         {
-            $this->PDO = $pdo;
+            $this->PDO = $pdo ?? (new DBConnection())->getConnection();
         }
 
         public function showAllCategories(string $sort = 'ASC') : array {
@@ -65,6 +66,30 @@ use Stringable;
 
         }
 
+        public function update(array $data) : bool {
+
+             $SQL = "UPDATE categories SET 
+                `Name` = :name, 
+                `Description` = :description, 
+                `Order` = :order, 
+                `Visibility` = :visibility, 
+                `Allow_Comment` = :allow_comment, 
+                `Allow_Ads` = :allow_ads 
+                WHERE `ID` = :id";
+            
+            $stmt = $this->PDO->prepare($SQL);
+            return $stmt->execute([
+                ':name'           => $data['name'],
+                ':description'    => $data['description'],
+                ':order'          => $data['order'],
+                ':visibility'     => $data['visible'],
+                ':allow_comment'  => $data['comments'],
+                ':allow_ads'      => $data['ads'],
+                ':id'             => $data['id']
+            ]);
+
+        }
+
         public function insert(array $data) : bool {
             
             $SQL = "INSERT INTO `categories` (`Name`, `Description`, `Order`, `Visibility`, `Allow_Comment`, `Allow_Ads`)
@@ -81,6 +106,19 @@ use Stringable;
             ]);
 
         }
+
+        public function delete($id) : bool {
+
+            $SQL = "DELETE FROM categories WHERE `categories`.`ID` = ?";
+
+             $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([$id]);
+
+            return (int) $stmt->rowCount() > 0;
+
+        }
+
+        
 
     }
 

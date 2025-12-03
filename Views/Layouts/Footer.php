@@ -21,8 +21,8 @@ use Core\Interfaces\ILayouts;
         {
             return <<< HTML
             </body>
-                <script src="{$this->charts}"></script>
-                <script src="{$this->js}"></script>
+                <script src="{$this->charts}" type="module" defer></script>
+                <script src="{$this->js}" type="module" defer></script>
             </html>
             HTML;    
         }

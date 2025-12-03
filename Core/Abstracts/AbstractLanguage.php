@@ -11,7 +11,7 @@
 
         public static function getKeyword($key) : string {
 
-            return self::$language[$key];
+            return self::$language[$key] ?? 'def';
 
         }
 

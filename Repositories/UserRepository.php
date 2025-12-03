@@ -2,6 +2,7 @@
 
     namespace Repositories;
 
+use Core\Database\DBConnection;
 use DateTime;
 use Exception;
 use Model\User;
@@ -11,9 +12,9 @@ use Model\User;
 
         private PDO $PDO;
 
-        public function __construct(PDO $DB)
+        public function __construct(PDO $DB = null)
         {
-            $this->PDO = $DB;
+            $this->PDO = (new DBConnection())->getConnection();
         }
 
         public function findById(int $id) : ?User {
@@ -125,19 +126,25 @@ use Model\User;
         return $stmt->fetchColumn() > 0;
 
     }
-    public function getAllMembers($limit = "", $sort = "ASC") : array {
+    public function getAllMembers($limit = null, $sort = "ASC") : array {
 
-            if(isset($limit)) {
-                $SQL = "SELECT * FROM users ORDER BY Username " . $sort . "LIMIT " . $limit;
-            } else {
-                $SQL = "SELECT * FROM users ORDER BY Username " . $sort;
-            }
-            $stmt = $this->PDO->prepare($SQL);
-            $stmt->execute();
-            
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sort = strtoupper($sort) === "DESC" ? "DESC" : "ASC";
 
+    $SQL = "SELECT * FROM users ORDER BY Username $sort";
+    if (!empty($limit)) {
+        $SQL .= " LIMIT :limit";
     }
+
+    $stmt = $this->PDO->prepare($SQL);
+
+    if (!empty($limit)) {
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    }
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
 
     public function deleteUser(int $id) : bool {
@@ -166,7 +173,7 @@ use Model\User;
         $stmt = $this->PDO->prepare($SQL);
         $stmt->execute();
 
-        return $stmt->columnCount() ?? 0;
+        return $stmt->fetchColumn() ?? 0;
     }
 
      public function getPendingUser() : array {

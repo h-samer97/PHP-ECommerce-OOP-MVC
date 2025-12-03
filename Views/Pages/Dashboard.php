@@ -1,9 +1,13 @@
+<main>
+         <?php use Views\Layouts\Navbar; echo (new Navbar())->Render(); ?>
 <section class="dashboard-container">
         <div class="dashboard-stats">
 
         <!-- Bar Dashboard -->
                 <div class="d-bar">
-                        <input type="text" id="" placeholder="Search Here...">
+                        <input type="text" id="searchBox" placeholder="Search Here...">
+                        <div class="sb-resultes">
+                        </div>
                         <button>
                                 <i class="fas fa-solid fa-bell"></i>
                         </button>
@@ -16,17 +20,17 @@
 
                 <!-- Charts -->
 
-                <div class="charts-row">
+               <div class="charts-row">
                         <div class="chart-box">
-                                <canvas class="charts" id="charts"></canvas>
-                                <canvas class="charts">
-                                        .......
-                                </canvas>
-                                <canvas class="charts">
-                                        ........
-                                </canvas>
+                        <h4>إحصائية تسجيل المستخدمين حسب السنة</h4>
+                        <canvas id="charts"></canvas>
                         </div>
-                </div> 
+                        <div class="chart-box">
+                        <h4>عدد العناصر حسب الفئة</h4>
+                        <canvas id="categoryChart"></canvas>
+                        </div>
+                        </div>
+
 
                 <div class="d-stats-info">
                         <div class="d-pie">
@@ -100,3 +104,4 @@ use Repositories\UserRepository;
         </div>
 
 </section>
+</main>

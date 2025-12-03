@@ -14,9 +14,17 @@ use Views\Layouts\Head;
                   foreach($rows as $row) {
                     echo '<div class="cat-section">';
                     echo '<h4>' . $row['Name'] . '</h4>';
-                        echo '<a href=\'category/edit\'>edit</a>' . '<a href=\'category/delete\'>delete</a>';
+                        echo '<a href="categories/' . $row['ID'] . '/edit">edit</a> <a href="categories/' . $row['ID'] . '/delete">delete</a>';
                     echo '<div class="cat">';
-                    echo '<img src="' . URL::ico('404') . '" alt="">';
+                   
+                    foreach($items as $item) {
+
+                        if($row['ID'] == $item['ICI']) {
+                            echo '<div>' . $item['Name'] . '</div>';
+                        }
+
+                    }
+
                     echo '<p>'. $row['Description'] .'</p>';
                     echo '<div class="cat-config">';
                         echo $row['Order'];
@@ -30,7 +38,7 @@ use Views\Layouts\Head;
 
                   }      
         
-                ?>
+        ?>
         </div>
 
     </main>
