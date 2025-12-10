@@ -4,6 +4,7 @@
     use Repositories\UserRepository;
     use Core\Database\DBConnection;
     use Core\Helper\Alert;
+use Core\Helper\FlashMessage;
 
     class MemberService {
 
@@ -31,8 +32,6 @@
         $password = !empty($data['newPassword'])
             ? password_hash($data['newPassword'], PASSWORD_DEFAULT)
             : $data['oldPassword'];
-
-            Alert::Print("تم التحديث بنجاح", 'success');
 
         return $this->repo->updateUser($userid, $username, $password, $email, $fullname);
     }

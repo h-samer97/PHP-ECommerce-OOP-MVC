@@ -1,6 +1,8 @@
 <?php
 namespace Core\Router;
 
+use Core\Helper\URL;
+
 class Router {
     protected array $routes = [];
 
@@ -54,6 +56,6 @@ class Router {
 
         // إذا لم يوجد تطابق → 404
         http_response_code(404);
-        echo "<h2>404 - Page Not Found</h2>";
+        URL::redirect('404');
     }
 }

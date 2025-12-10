@@ -1,181 +1,141 @@
 <?php
 
-
 namespace Controllers;
 
 use Core\Database\DBConnection;
-use Core\Helper\Alert;
+use Core\Helper\FlashMessage;
 use Core\Helper\URL;
-use Model\User;
-use PDO;
 use Repositories\UserRepository;
+use Services\CSRFToken;
 use Services\MemberService;
 use Services\SessionsServices;
-use Views\Layouts\Footer;
-use Views\Layouts\Head;
-use Core\Helper\FlashMessage;
-use Soap\Url as SoapUrl;
 
-    class MembersController {
+class MembersController {
 
-        private MemberService $Service;
+    private MemberService $Service;
+    private UserRepository $repo;
 
-
-        public function __construct()
-        {
-            $this->Service = new MemberService();
-        }
-
-
-
-        public function index() {       
-                
-                    FlashMessage::init();
-                    FlashMessage::display();
-
-                    $users = new UserRepository(( new DBConnection())->getConnection() );
-                    $rows = $users->getAllMembers();
-
-                    include BASE_PATH . '/Views/Pages/MemberManage.php';
+    public function __construct()
+    {
+        $this->Service = new MemberService();
+        $this->repo = new UserRepository((new DBConnection())->getConnection());
     }
 
+    public function index() {
+        $rows = $this->repo->getAllMembers();
+        include BASE_PATH . '/Views/Pages/Members/MemberManage.php';
+    }
 
-        public function getPendingUsers() {
-            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-            $rows = $repo->getPendingUser();
-            include BASE_PATH . '/Views/Pages/MemberManage.php';
-        }
+    public function getPendingUsers() {
+        $rows = $this->repo->getPendingUser();
+        include BASE_PATH . '/Views/Pages/MemberManage.php';
+    }
 
-        public function acceptUser($id) : void {
+    public function acceptUser(int $id): void {
+        $this->repo->acceptUser($id);
+        FlashMessage::init();
+        FlashMessage::success('The user has been accepted');
+        URL::redirect('members');
+    }
 
-            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-            $rows = $repo->acceptUser($id);
-            FlashMessage::init();
-            FlashMessage::success('The User has Accepted');
-            URL::redirect('members');
-
-        }
-
-        public function edit(int $id) {
-
-        echo (new Head('Edit Member', 'editmembers'))->Render();
+    public function edit(int $id) {
 
         $user = $this->Service->getMemberById($id);
 
         if ($user) {
-
-            $rows = $user;
-
-            include BASE_PATH . 'Views/Pages/Members.php';
-
+            $userRecord = $user;
+            include BASE_PATH . '/Views/Pages/Members/EditMembers.php';
         } else {
-
-            Alert::Print("المستخدم غير موجود", 'error');
+            FlashMessage::init();
+            FlashMessage::error("المستخدم غير موجود");
             URL::redirect('404');
         }
-
-        echo (new Footer('script', ''))->Render();
     }
 
+    public function delete(int $id) {
+    // Dont delete Myself :o
+    if ($id == $_SESSION['UserID']) {
+        FlashMessage::error('You cannot delete your own account!');
+        URL::redirect('members');
+        return;
+    }
 
-        public function delete(int $id) {
+    if ($this->repo->deleteUser($id)) {
+        FlashMessage::init();
+        FlashMessage::success('The user has been deleted');
+    } else {
+        FlashMessage::init();
+        FlashMessage::error('Failed to delete user or user not found');
+    }
+    
+    URL::redirect('members');
+}
 
-            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-            $repo->deleteUser($id);
-            FlashMessage::init();
-            FlashMessage::success('The User Has been deleted');
-            URL::redirect('members');
+    public function insert() {
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            $username = trim($_POST['username']);
+            $password = $_POST['newPassword'];
+            $email    = trim($_POST['email']);
+            $fullname = trim($_POST['fullName']);
+            $avatar   = null;
 
-        }
-
-        public function insert() {
-
-            $session = new SessionsServices();
-
-            if($_SERVER['REQUEST_METHOD'] === "POST") {
-                
-                $username = trim($_POST['username']);
-                $password = password_hash($_POST['newPassword'], PASSWORD_DEFAULT);
-                $email    = trim($_POST['email']);
-                $fullname = trim($_POST['fullName']);
-                $avatar   = null; // لاحقاً يمكن إضافة رفع صورة
-
-                $repo = new UserRepository((new DBConnection())->getConnection());
-
-                if ($repo->exists($username, $email)) {
-                    FlashMessage::warning('This user Already Exists');
+            if ($this->repo->exists($username, $email)) {
+                FlashMessage::init();
+                FlashMessage::warning('This user already exists');
+            } else {
+                $status = $this->repo->insertUser($username, $password, $email, $fullname, $avatar);
+                FlashMessage::init();
+                if ($status) {
+                    FlashMessage::success('Member added successfully');
                 } else {
-                    $status = $repo->insertUser($username, $password, $email, $fullname, $avatar);
-
-                    if ($status) {
-                        FlashMessage::success('This Member Was Added');
-                    } else {
-                        FlashMessage::error('Field Add User');
-                    }
+                    FlashMessage::error('Failed to add member');
                 }
-
-                URL::redirect('members');
-
             }
-            
-            include BASE_PATH . '/Views/Pages/AddMember.php';
+            URL::redirect('members');
         }
 
-       public function update() {
+        include BASE_PATH . '/Views/Pages/AddMember.php';
+    }
+
+    public function update() {
+
+        $csrf = new CSRFToken();
+        
+        if(!$csrf->validateRequest($_SERVER, $_POST)) {
+            http_response_code(419);
+            FlashMessage::init();
+            FlashMessage::error('Page Expired! - ERROR 419');
+            return;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             $errors = [];
 
-            if(empty($_POST['username']) || strlen($_POST['username']) < 10) {
-
-                $errors[] = "User Name Invalid";
-
+            if (empty($_POST['username']) || strlen($_POST['username']) < 3) {
+                $errors[] = "Invalid username";
             }
-            if(empty($_POST['email'])) {
-
-                $errors[] = "Email Name Invalid";
-
+            if (empty($_POST['email'])) {
+                $errors[] = "Invalid email";
             }
 
-            if(!empty($errors)) {
-
-                foreach($errors as $error) {
-                    Alert::Print($error, 'error');
-                    return;
+            if (!empty($errors)) {
+                FlashMessage::init();
+                foreach ($errors as $error) {
+                    FlashMessage::error($error);
                 }
-
-
-            } else {
-
-                $this->Service->updateMember($_POST);
-
+                URL::redirect('members/edit/' . ($_POST['id'] ?? 0));
+                return;
             }
 
-
-
-            // URL::redirect('members?do=manage');
+            $this->Service->updateMember($_POST);
+            FlashMessage::init();
+            FlashMessage::success('Member updated successfully');
+            URL::redirect('members');
 
         } else {
-
             URL::redirect('404');
-
         }
     }
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
+}
 
 ?>

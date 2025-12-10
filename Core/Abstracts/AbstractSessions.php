@@ -3,6 +3,7 @@
    namespace Core\Abstracts;
 
 use Core\Interfaces\ISessions;
+use Exception;
 
 abstract class AbstractSessions implements ISessions {
 
@@ -15,10 +16,10 @@ abstract class AbstractSessions implements ISessions {
         $httpOnly = true;
 
         if (session_status() === PHP_SESSION_ACTIVE) {
-            return false; // الجلسة شغالة بالفعل
+            return false; // Active Current Session
         }
 
-        // إعدادات أمان إضافية
+        // Additianl Settings
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.use_trans_sid', '0');
@@ -35,6 +36,16 @@ abstract class AbstractSessions implements ISessions {
         return true;
     }
 
+    public function checkIfExist() : bool {
+
+        if(session_status() === PHP_SESSION_ACTIVE) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public function set(string $key, string $value) : bool {
 
         if(session_status() !== PHP_SESSION_ACTIVE) $this->start();
@@ -45,7 +56,7 @@ abstract class AbstractSessions implements ISessions {
 
     }
 
-    public function get(string $key) : string {
+    public function get(string $key) : mixed {
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             $this->start();
@@ -55,7 +66,7 @@ abstract class AbstractSessions implements ISessions {
             return $_SESSION[$key];
         }
 
-        return 'No Session Data..';
+        return null;
     }
 
     public function has(string $key): bool {

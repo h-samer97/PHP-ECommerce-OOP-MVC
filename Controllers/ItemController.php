@@ -1,160 +1,147 @@
 <?php
 
+namespace Controllers;
 
-    namespace Controllers;
-
-use Core\Helper\Alert;
 use Core\Helper\FlashMessage;
-use Core\Helper\URL as HelperURL;
-use Repositories\ItemRepository;
-use Services\SessionsServices;
 use Core\Helper\URL;
+use Repositories\ItemRepository;
 use Repositories\CategoryRepository;
 use Repositories\UserRepository;
-use Soap\Url as SoapUrl;
+use Services\SessionsServices;
+use Services\CSRFToken;
 
-    class ItemController {
+class ItemController {
 
-        public function __construct()
-        {
-            new SessionsServices();
-        }
-
-        public function insert() {
-            
-            $repo = new ItemRepository();
-            $Cats = $repo->getCategoriesNameAID();
-            $Members = $repo->getUsersWithID();
-
-            if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-                $required = ['item-name', 'item-description', 'item-price', 'item-country', 'item-status', 'item-rating', 'cat-id', 'member-id'];
-
-                foreach($required as $req) {
-                    if(empty($_POST[$req])) {
-                        FlashMessage::init();
-                        FlashMessage::error('Please Fill all Fields');
-                        exit;
-                    }
-                }
-
-                    $itemName = trim($_POST['item-name']);
-                    $itemDescription = trim($_POST['item-description']);
-                    $itemPrice = (float) $_POST['item-price'];
-                    $itemCountry = trim($_POST['item-country']);
-                    $itemStatus = (int) $_POST['item-status'];
-                    $itemRating = (int) $_POST['item-rating'];
-                    $catId = (int) $_POST['cat-id'];
-                    $memberId = (int) $_POST['member-id'];
-
-                if(!is_numeric($_POST['item-price']) or $_POST['item-price'] < 0) {
-                    Alert::Print('invalid price');
-                    exit;
-                }
-
-                 $repo = new ItemRepository();
-                $status = $repo->insert($itemName, $itemDescription, $itemPrice, $itemCountry, $itemStatus, $itemRating, $catId, $memberId);
-
-                if($status) {
-                    FlashMessage::init();
-                    FlashMessage::success('the item was inserted');
-                    FlashMessage::display();
-                    URL::redirect('items');
-                    exit;
-                }
-
-                }
-
-            include BASE_PATH . '/Views/Pages/Items/AddItem.php';
-
-        }
-
-        public function edit($id) {
-
-            $repo = new ItemRepository();
-            $row = $repo->findById($id);
-
-            $repo2 = new CategoryRepository();
-            $Cats = $repo2->showAllCategories();
-
-            $repo3 = new UserRepository();
-            $Members = $repo3->getAllMembers();
-
-            include BASE_PATH . '/Views/Pages/Items/EditItem.php';
-
-        }
-
-        public function update() {
-
-            if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-                 $itemName = trim($_POST['item-name']);
-                    $itemDescription = trim($_POST['item-description']);
-                    $itemPrice = (float) $_POST['item-price'];
-                    $itemCountry = trim($_POST['item-country']);
-                    $itemStatus = (int) $_POST['item-status'];
-                    $itemRating = (int) $_POST['item-rating'];
-                    $catId = (int) $_POST['cat-id'];
-                    $memberId = (int) $_POST['member-id'];
-
-                    // read the item id (expected from a hidden input in the edit form)
-                    $itemId = isset($_POST['item-id']) ? (int) $_POST['item-id'] : 0;
-
-                if(!is_numeric($_POST['item-price']) or $_POST['item-price'] < 0) {
-                    Alert::Print('invalid price');
-                    exit;
-                }
-
-                $repo = new ItemRepository();
-                $status = $repo->update($itemId, $itemName, $itemDescription, $itemPrice, $itemCountry, $itemStatus, $itemRating, $catId, $memberId);
-
-                if($status) {
-
-                    FlashMessage::init();
-                    FlashMessage::success('this item had Updated!');
-                    FlashMessage::display();
-                    URL::redirect('items');
-
-                }
-
-            }
-
-        }
-
-        public function delete($id) {
-
-            $repo = new ItemRepository();
-            $repo->delete($id);
-
-            FlashMessage::init();
-            FlashMessage::success('item had deleted');
-
-        }
-
+    public function __construct()
+    {
+        new SessionsServices();
     }
 
+    public function index() {
+        echo 'show Items';
+    }
 
+    private function getItemDataFromPost(): array
+    {
+        return [
+            'id'          => isset($_POST['item-id']) ? (int) $_POST['item-id'] : 0,
+            'name'        => trim($_POST['item-name'] ?? ''),
+            'description' => trim($_POST['item-description'] ?? ''),
+            'price'       => (float) ($_POST['item-price'] ?? 0),
+            'country'     => trim($_POST['item-country'] ?? ''),
+            'status'      => (int) ($_POST['item-status'] ?? 0),
+            'rating'      => (int) ($_POST['item-rating'] ?? 0),
+            'catId'       => (int) ($_POST['cat-id'] ?? 0),
+            'memberId'    => (int) ($_POST['member-id'] ?? 0),
+        ];
+    }
 
+    public function insert() {
+        $repo = new ItemRepository();
+        $Cats = $repo->getCategoriesNameAID();
+        $Members = $repo->getUsersWithID();
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $required = ['item-name', 'item-description', 'item-price', 'item-country', 'item-status', 'item-rating', 'cat-id', 'member-id'];
 
+            foreach ($required as $req) {
+                if (empty($_POST[$req])) {
+                    FlashMessage::init();
+                    FlashMessage::error('Please fill all fields');
+                    URL::redirect('items/add');
+                    return;
+                }
+            }
 
+            $data = $this->getItemDataFromPost();
 
+            if ($data['price'] < 0) {
+                FlashMessage::init();
+                FlashMessage::error('Invalid price');
+                URL::redirect('items/add');
+                return;
+            }
 
+            $status = $repo->insert(
+                $data['name'], $data['description'], $data['price'], $data['country'],
+                $data['status'], $data['rating'], $data['catId'], $data['memberId']
+            );
 
+            FlashMessage::init();
+            if ($status) {
+                FlashMessage::success('Item inserted successfully!');
+                URL::redirect('items');
+            } else {
+                FlashMessage::error('Failed to insert item');
+                URL::redirect('items/add');
+            }
+        }
 
+        include BASE_PATH . '/Views/Pages/Items/AddItem.php';
+    }
 
+    public function edit($id) {
+        $repo = new ItemRepository();
+        $row = $repo->findById($id);
 
+        $repo2 = new CategoryRepository();
+        $Cats = $repo2->showAllCategories();
 
+        $repo3 = new UserRepository();
+        $Members = $repo3->getAllMembers();
 
+        include BASE_PATH . '/Views/Pages/Items/EditItem.php';
+    }
 
+    public function update() {
 
+         $csrf = new CSRFToken();
+        
+        if(!$csrf->validateRequest($_SERVER, $_POST)) {
+            http_response_code(419);
+            FlashMessage::init();
+            FlashMessage::error('Page Expired! - ERROR 419');
+            return;
+        }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = $this->getItemDataFromPost();
 
+            if ($data['price'] < 0) {
+                FlashMessage::init();
+                FlashMessage::error('Invalid price');
+                URL::redirect('items/edit/' . $data['id']);
+                return;
+            }
 
+            $repo = new ItemRepository();
+            $status = $repo->update(
+                $data['id'], $data['name'], $data['description'], $data['price'],
+                $data['country'], $data['status'], $data['rating'], $data['catId'], $data['memberId']
+            );
 
+            FlashMessage::init();
+            if ($status) {
+                FlashMessage::success('Item updated successfully!');
+                URL::redirect('items/manage');
+            } else {
+                FlashMessage::error('Failed to update item');
+            }
+        }
+    }
 
+    public function delete($id) {
+        $repo = new ItemRepository();
+        $status = $repo->delete($id);
 
-
-
+        FlashMessage::init();
+        if ($status) {
+            FlashMessage::success('Item deleted successfully!');
+        } else {
+            FlashMessage::error('Failed to delete item');
+        }
+        URL::redirect('items');
+    }
+}
 
 ?>

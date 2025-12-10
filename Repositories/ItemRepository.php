@@ -42,8 +42,7 @@ class ItemRepository
 
         return $stmt->execute();
     } catch (PDOException $e) {
-        Alert::Print($e->getMessage());
-        return false;
+        return $e->getMessage();
     }
 }
 

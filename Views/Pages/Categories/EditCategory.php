@@ -2,38 +2,55 @@
 
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
+use Services\CSRFToken;
 
- echo (new Head('Add Category', 'addMember'))->Render();
+# helper Func
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Add Category', 'addMember'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
 
 ?>
-<form class="container" method="POST" action="<?php echo BASE_URL . 'categories/' . $rows->ID . '/update' ?>">
+<form class="container" method="POST" action="<?php echo BASE_URL . 'categories/' . e($rows->ID) . '/update' ?>">
 <div class="card">
   <div class="card-header">
     <h2>Edit Category</h2>
   </div>
-  <!-- ضع العناصر التالية داخل هذه البطاقة -->
 </div>
+
 <div class="field">
   <label class="label">
     Category Name
     <span class="req" aria-hidden="true">*</span>
   </label>
-  <input type="text" class="input" placeholder="" name="name" value="<?php echo $rows->Name ?>">
-  <input type="hidden" name="id" value="<?php echo $rows->ID ?>">
+  <input type="text" class="input" name="name" value="<?php echo e($rows->Name) ?>">
+  <input type="hidden" name="id" value="<?php echo e($rows->ID) ?>">
+        <?php
+
+              $csrf = new CSRFToken();
+              echo $csrf->generateFieldToken();
+
+        ?>
 </div>
+
 <div class="field">
   <label class="label">Description Category</label>
-  <textarea class="textarea" rows="3" placeholder="Describe" name="description">
-    <?php echo $rows->Description ?></textarea>
+  <textarea class="textarea" rows="3" name="description"><?php echo e($rows->Description) ?></textarea>
 </div>
+
 <div class="field">
   <label class="label">Sort</label>
   <div class="number-wrap">
-    <input type="number" class="input number-input" min="0" step="1" placeholder="ex: 10" name="order" value="<?php echo $rows->Order ?>">
+    <input type="number" class="input number-input" min="0" step="1" name="order" value="<?php echo e($rows->Order) ?>">
     <span class="suffix">#</span>
   </div>
-
 </div>
+
 <div class="field">
   <label class="label">Visibility</label>
   <div class="radio-group">
@@ -81,16 +98,14 @@ use Views\Layouts\Head;
     </label>
   </div>
 </div>
+
 <div class="actions">
   <button type="submit" class="btn-primary">
     Update Category
   </button>
 </div>
 </form>
+
 <?php 
-
-
-    echo (new Footer('script', 'chart.umd.min'))->Render();
-
-
+echo (new Footer('script', 'chart.umd.min'))->Render();
 ?>

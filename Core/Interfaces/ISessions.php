@@ -6,7 +6,7 @@
 
         public function start(): bool;
         public function set(string $key, string $value): bool;
-        public function get(string $key) : string;
+        public function get(string $key) : mixed;
         public function has(string $key): bool;
         public function remove(string $key): void;
         public function destroy(): bool;

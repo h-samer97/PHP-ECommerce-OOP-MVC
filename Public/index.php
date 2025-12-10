@@ -13,14 +13,12 @@ use Controllers\ItemController;
 use Controllers\MembersController;
 use Core\Helper\URL;
 use Core\Router\Router;
+use Middleware\VerifyCsrfToken;
 use Services\SessionsServices;
 
-// إنشاء الراوتر
 $router = new Router();
 
-/**
- * صفحة تسجيل الدخول
- */
+
 $router->add('login', function() {
     $auth = new AuthController();
     $auth->login();
@@ -29,9 +27,7 @@ $router->add('/', function() {
     $auth = new AuthController();
     $auth->login();
 });
-/**
- * تسجيل الخروج
- */
+
 $router->add('logout', function() {
     $session = new SessionsServices();
     $session->start();
@@ -81,11 +77,15 @@ $router->add('members/{id}/activate', function($id) {
     $members = new MembersController();
     $members->acceptUser($id);
 });
+$router->add('members/update', function() {
+    $members = new MembersController();
+    $members->update();
+});
 
 $router->add('api/getUsersWithDates', function() {
 
-    $dashboard = new DashboardController();
-    $dashboard->getUsersWithDates();
+   $api = new DashboardController();
+   $api->getUsersWithDates();
 
 });
 
@@ -161,13 +161,13 @@ $router->add('items/{id}/delete', function($id) {
     $item->delete($id);
 });
 
-$router->add('items/{id}/delete', function($id) {
+$router->add('items/manage', function($id) {
     $item = new ItemController();
-    $item->delete($id);
+    $item->index();
 });
 
 $router->add('test', function() {
-        include BASE_PATH . '/Views/Layouts/Sidebar.php';
+        include BASE_PATH . '/Views/Pages/test.php';
 });
 
 
@@ -175,8 +175,31 @@ $router->add('test', function() {
  * صفحة الخطأ 404
  */
 $router->add('404', function() {
-    include BASE_PATH . 'Views/Pages/404.php';
+    include BASE_PATH . '/Views/Pages/Main/404.php';
 });
+
+
+
+$middleware = new VerifyCsrfToken();
+
+$middleware->handle(function () {
+    // هنا يتابع الراوتر إلى الـ controllers
+    // مثال بسيط:
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+
+    if ($uri === '/profile/update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        // تنفيذ الأكشن بعد مرور الميدلوير
+        echo 'تم التحديث بنجاح';
+        return;
+    }
+
+});
+
+
+
+
+
+
 
 // تنفيذ التوجيه
 $router->dispatch();

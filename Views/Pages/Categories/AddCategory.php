@@ -2,8 +2,12 @@
 
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
 
  echo (new Head('Add Category', 'addMember'))->Render();
+
+        FlashMessage::init();
+        FlashMessage::display();
 
 ?>
 <form class="container" method="POST" action="<?php echo BASE_URL . 'categories/add'; ?>">

@@ -2,61 +2,42 @@
 
 namespace Controllers;
 
-use Core\Database\DBConnection;
-use Core\Helper\Alert;
-use Core\Helper\URL;
-use Repositories\UserRepository;
-use Services\SessionsServices;
+use Services\APIServices;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
-use Views\Layouts\Navbar;
 
 class DashboardController {
+    private APIServices $api;
+
+    public function __construct() {
+        $this->api = new APIServices();
+    }
+
     public function index() {
-        $session = new SessionsServices();
-        
-        $sessionStatus = $session->has('username');
-        if(!$sessionStatus) URL::redirect('login');
-        
-        $head = new Head('Dashboard', 'dashboard');
-        echo $head->Render();
-
-
+        echo (new Head('Dashboard', 'dashboard'))->Render();
         include BASE_PATH . '/Views/Pages/Dashboard.php';
-
         echo (new Footer('script', 'chart.umd.min'))->Render();
-
-        if ($session->has('username')) {
-            
-        } else {
-            echo "No session found, please login.";
-        }
     }
 
-    public function searchBox() {
-
-        include BASE_PATH . '/APIs/searchResulte.php';
-
+    private function jsonResponse($data): void {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
-    public function getUsersWithDates() {
-
-        include BASE_PATH . "/APIs/getUsersWithDates.php";
-
+    public function getUsersWithDates(): void {
+        $this->jsonResponse($this->api->getUsersWithDates());
     }
 
-    public function getCats() {
-
-        include BASE_PATH . '/APIs/getItemsCountWithCats.php';
-
+    public function getCats(): void {
+        $this->jsonResponse($this->api->getItemsCountWithCats());
     }
 
-    public function getCountryMade() {
-
-        include BASE_PATH . '/APIs/getCountryMadeAPI.php';
-
+    public function getCountryMade(): void {
+        $this->jsonResponse($this->api->getCountryMade());
     }
 
-
+    public function searchBox(): void {
+        $q = $_GET['q'] ?? '';
+        $this->jsonResponse($this->api->searchData($q));
+    }
 }
-?>

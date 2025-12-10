@@ -19,15 +19,14 @@ use Repositories\UserRepository;
             $row = $this->repo->findByUsername($username);
 
             if (!$row) {
-                Alert::Print('error Verify Login', 'error');
                 return false;
             };
 
             if (password_verify($password, $row->password)) {
-                
-                return $row ?? true;
+                return $row;
             }
 
+            return false;
 
         }
 

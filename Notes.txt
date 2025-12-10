@@ -1,0 +1,25 @@
+[1] => Services API Data --> fix
+[2] => RegExp
+[3] => CSRF (Cross-Site Request Forgery)
+[4] => Authorization in pages like dashboard
+[5] => Input Class POST/GET
+[6] => binary Search
+
+
+
+
+
+
+
+
+
+
+
+SELECT tags.tag_name
+FROM tags
+INNER JOIN item_tags ON tags.tag_id = item_tags.tag_id
+WHERE item_tags.item_id = 1;
+------
+SELECT *
+FROM item_tags_view
+WHERE Item_id = 1;

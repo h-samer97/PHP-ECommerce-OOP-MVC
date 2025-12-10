@@ -1,3 +1,9 @@
+<?php
+
+    if(!empty($alertMessage)) echo $alertMessage;
+
+?>
+
 <form action="<?php echo BASE_URL . 'login'; ?>" method="post" class="login">
         <h2>login system</h2>
         <input type="text" placeholder="username" name="username" class="username">

@@ -55,12 +55,12 @@ use Stringable;
 
             );
         }
-        public function isExist(string $name) : bool {
+        public function isExist(string $name, ?int $id = null) : bool {
 
-            $SQL = "SELECT COUNT(*) FROM categories WHERE Name = ? ";
+            $SQL = "SELECT COUNT(*) FROM categories WHERE `Name` = ? AND `ID` != ? ";
 
             $stmt = $this->PDO->prepare($SQL);
-            $stmt->execute([$name]);
+            $stmt->execute([$name, $id]);
 
             return (int) $stmt->fetchColumn() > 0;
 

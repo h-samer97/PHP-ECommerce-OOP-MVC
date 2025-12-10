@@ -1,5 +1,5 @@
 ==================================================
-=== FILE: ./Views/Pages/404.php
+=== FILE: ./Views/Pages/Main/404.php
 ==================================================
 <?php
 
@@ -15,239 +15,118 @@ echo (new Head('404', '404'))->Render(); ?>
 
 
 ==================================================
-=== FILE: ./Views/Pages/Members.php
-==================================================
-
-  <form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/update'; ?>">
-    <h2><i class="fa fa-user-edit"></i> Edit Member</h2>
-
-    <div class="form-group">
-      <label for="username" class="required">Username</label>
-      <input type="hidden" name="userid" value="<?php echo $userRecord->userID ?>">
-      <input type="text" id="username" placeholder="Enter username" name="username" value="<?php echo $userRecord->username ?>" required>
-    </div>
-
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password" value="" name="newPassword">
-      <input type="hidden" id="password" placeholder="Enter password" name="oldPassword" value="<?php echo $userRecord->password ?>">
-    </div>
-
-    <div class="form-group">
-      <label for="email" class="required">Email</label>
-      <input type="email" id="email" placeholder="Enter email" value="<?php echo $userRecord->email ?>" name="email" required>
-    </div>
-
-    <div class="form-group">
-      <label for="fullname" class="required">Full Name</label>
-      <input type="text" id="fullname" placeholder="Enter full name" value="<?php echo $userRecord->fullName ?>" name="fullName">
-    </div>
-
-    <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save</button>
-  </form>
-
-
-
-==================================================
-=== FILE: ./Views/Pages/MemberManage.php
+=== FILE: ./Views/Pages/Main/Dashboard.php
 ==================================================
 <?php
 
-use Views\Layouts\Footer;
-use Views\Layouts\Head;
-
- echo (new Head('Add Member', 'addMember'))->Render();
-
-?>
-<div class="container">
-    <h1>لوحة إدارة الأعضاء</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>#ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Full Name</th>
-          <th>Date Regester</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-       <?php foreach ($rows as $row): ?>
-        <tr>
-          <td><?php echo $row['UserID']; ?></td>
-          <td><?php echo $row['Username']; ?></td>
-          <td><?php echo $row['Email']; ?></td>
-          <td><?php echo $row['FullName']; ?></td>
-          <td><?php echo $row['Date_Reg']; ?></td>
-          <td>
-            <a class='btn-blue' href="<?php echo BASE_URL . 'members/' . $row['UserID'] . '/edit'; ?>" class="table-control">Edit</a>
-            <?php if($row['RegStatus'] == 0){ ?>
-              <a class='btn-green' href="<?php echo BASE_URL . 'members/' . $row['UserID'] . '/accept'; ?>" class="table-control">Accept</a>
-            <?php } ?>
-            <a class='btn-red' href="<?php echo BASE_URL . 'members/' . $row['UserID'] . '/delete'; ?>" class="table-control">Delete</a>
-        </td>
-      </tr>
-    <?php endforeach; ?>
-      </tbody>
-    </table>
-    <button class="add-member">+ إضافة عضو جديد</button>
-  </div>
-<?php 
-
-
-    echo (new Footer('script', 'chart.umd.min'))->Render();
-
-
-?>
-
-
-==================================================
-=== FILE: ./Views/Pages/test.php
-==================================================
-<?php
-include BASE_PATH . '/Core/Config/Config.php';
-
-$url = "https://api.exchangerateapi.net/v1/latest?base=USD";
-$headers = ["apikey: " . EXCHANGE_RATE_API_KEY];
-
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-$response = curl_exec($ch);
-unset($ch);
-
-$data = json_decode($response, true);
-
-if (isset($data['data']) && is_array($data['data'])) {
-    echo "<h3>Exchange Rates (Base USD)</h3><ul>";
-    foreach ($data['data'] as $currency => $info) {
-        echo "<li><strong>{$currency}</strong> → {$info['value']}</li>";
-    }
-    echo "</ul>";
-}
-
-if (isset($data['meta'])) {
-    echo "<p>Last updated: " . htmlspecialchars($data['meta']['last_updated_at']) . "</p>";
-}
-?>
-
-
-
-==================================================
-=== FILE: ./Views/Pages/Dashboard.php
-==================================================
-<?php include BASE_PATH . '/Views/Layouts/Sidebar.php' ?>
-<main>
-         <?php use Views\Layouts\Navbar; echo (new Navbar())->Render(); ?>
-<section class="dashboard-container">
-        <div class="dashboard-stats">
-
-        <!-- Bar Dashboard -->
-                <div class="d-bar">
-                        <input type="text" id="" placeholder="Search Here...">
-                        <button>
-                                <i class="fas fa-solid fa-bell"></i>
-                        </button>
-                </div>
-
-                <div class="d-hello">
-                        <h3>Lorem ipsum dolor sit amet consectetur.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam.</p>
-                </div>
-
-                <!-- Charts -->
-
-               <div class="charts-row">
-                        <div class="chart-box">
-                        <h4>إحصائية تسجيل المستخدمين حسب السنة</h4>
-                        <canvas id="charts"></canvas>
-                        </div>
-                        <div class="chart-box">
-                        <h4>عدد العناصر حسب الفئة</h4>
-                        <canvas id="categoryChart"></canvas>
-                        </div>
-                        </div>
-
-
-                <div class="d-stats-info">
-                        <div class="d-pie">
-<?php
-
+use Views\Layouts\Navbar;
 use Core\Database\DBConnection;
 use Repositories\UserRepository;
+use Core\Helper\URL;
 
-                $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-                echo $repo->sumCountAllUsers();
-
-
+// دالة مساعدة مختصرة للترميز الآمن
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
 
 ?>
-                        </div>
-                        <div class="d-line">
-                                charts
-                        </div>
-                </div>
+<main>
+    <?php echo (new Navbar())->Render(); ?>
+    <section class="dashboard-container">
+        <div class="dashboard-stats">
 
+            <!-- Bar Dashboard -->
+            <div class="d-bar">
+                <input type="text" id="searchBox" placeholder="Search Here...">
+                <div class="sb-resultes"></div>
+                <button>
+                    <i class="fas fa-solid fa-bell"></i>
+                </button>
+            </div>
+
+            <div class="d-hello">
+                <h3>Lorem ipsum dolor sit amet consectetur.</h3>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam.</p>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-row">
+                <div class="chart-box">
+                    <h4>إحصائية تسجيل المستخدمين حسب السنة</h4>
+                    <canvas id="charts"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h4>عدد العناصر حسب الفئة</h4>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <div class="d-stats-info">
+                <div class="d-pie">
+                    <?php
+                        $repo = new UserRepository((new DBConnection())->getConnection());
+                        echo e($repo->sumCountAllUsers());
+                    ?>
+                </div>
+                <div class="d-line">
+                    charts
+                </div>
+            </div>
         </div>
 
         <div class="dashboard-info">
-                <h3>My Profile</h3>
-                <div class="d-profile">
-                        <div class="d-profile-name">
-                                <img src="<?php
-
-                                        use Core\Helper\URL;
-
-                                        echo URL::ico('editmembers') ?>" alt="">
-                                <div class="d-txt">
-                                        <h4>Samer</h4>
-                                        <span>Lorem ipsum dolor sit.</span>
-                                        <div class="d-addr">
-                                                <i class="fa fa-map-marker"></i> 
-                                                <span>Lorem, ipsum.</span>
-                                        </div>
-                                </div>
+            <h3>My Profile</h3>
+            <div class="d-profile">
+                <div class="d-profile-name">
+                    <img src="<?php echo e(URL::ico('editmembers')); ?>" alt="">
+                    <div class="d-txt">
+                        <h4><?php echo e($user->name ?? 'Guest'); ?></h4>
+                        <span><?php echo e($user->bio ?? 'No bio available'); ?></span>
+                        <div class="d-addr">
+                            <i class="fa fa-map-marker"></i> 
+                            <span><?php echo e($user->address ?? 'Unknown'); ?></span>
                         </div>
-                        <div class="d-profile-box">
-                                <div>
-                                        <span>lorem</span>
-                                        <p>43</p>
-                                </div>
-                                <div>
-                                        <span>lorem</span>
-                                        <p>56</p>
-                                </div>
-                                <div>
-                                        <span>lorem</span>
-                                        <p>432423</p>
-                                </div>
-                        </div>
+                    </div>
                 </div>
-
-                <div class="d-commends">
-                        <h3>Last 10 Commends</h3>
-                        <div class="d-c-list">
-                                <span>good</span>
-                                <span>good</span>
-                                <span>good</span>
-                                <span>good</span>
-                                <span>good</span>
-                                <span>good</span>
-                                <span>good</span>
-                                <span>good</span>
-                        </div>
+                <div class="d-profile-box">
+                    <div>
+                        <span>lorem</span>
+                        <p><?php echo e($user->posts ?? 0); ?></p>
+                    </div>
+                    <div>
+                        <span>lorem</span>
+                        <p><?php echo e($user->comments ?? 0); ?></p>
+                    </div>
+                    <div>
+                        <span>lorem</span>
+                        <p><?php echo e($user->followers ?? 0); ?></p>
+                    </div>
                 </div>
+            </div>
 
+            <div class="d-commends">
+                <h3>Last 10 Commends</h3>
+                <div class="d-c-list">
+                    <?php foreach($comments as $comment): ?>
+                        <span><?php echo e($comment['text']); ?></span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
-
-</section>
+    </section>
 </main>
 
 
+
 ==================================================
-=== FILE: ./Views/Pages/Login.php
+=== FILE: ./Views/Pages/Main/Login.php
 ==================================================
+<?php
+
+    if(!empty($alertMessage)) echo $alertMessage;
+
+?>
+
 <form action="<?php echo BASE_URL . 'login'; ?>" method="post" class="login">
         <h2>login system</h2>
         <input type="text" placeholder="username" name="username" class="username">
@@ -265,48 +144,46 @@ use Repositories\UserRepository;
 
 
 ==================================================
-=== FILE: ./Views/Pages/AddMember.php
+=== FILE: ./Views/Pages/test.php
 ==================================================
 <?php
 
-use Views\Layouts\Footer;
+use Core\Helper\Alert;
+use Services\CSRFToken;
 use Views\Layouts\Head;
 
- echo (new Head('Add Member', 'addMember'))->Render();
+echo (new Head('', ''))->Render();
+
+// include BASE_PATH . '/Core/Config/Config.php';
+
+// $url = "https://api.exchangerateapi.net/v1/latest?base=USD";
+// $headers = ["apikey: " . EXCHANGE_RATE_API_KEY];
+
+// $ch = curl_init($url);
+// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+// curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+// $response = curl_exec($ch);
+// unset($ch);
+
+// $data = json_decode($response, true);
+
+// if (isset($data['data']) && is_array($data['data'])) {
+//     echo "<h3>Exchange Rates (Base USD)</h3><ul>";
+//     foreach ($data['data'] as $currency => $info) {
+//         echo "<li><strong>{$currency}</strong> → {$info['value']}</li>";
+//     }
+//     echo "</ul>";
+// }
+
+// if (isset($data['meta'])) {
+//     echo "<p>Last updated: " . htmlspecialchars($data['meta']['last_updated_at']) . "</p>";
+
+  echo $_SERVER['REQUEST_URI'];
+
+  $uri = parse_url($server['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 
 ?>
-  <form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/insert'; ?>">
-    <h2><i class="fa fa-user-edit"></i> Add a Member</h2>
 
-    <div class="form-group">
-      <label for="username" class="required">Username</label>
-      <input type="text" id="username" placeholder="Enter username" name="username" value="" required>
-    </div>
-
-    <div class="form-group">
-      <label for="password" class="required">Password</label>
-      <input type="password" id="password" placeholder="Enter password" value="" name="newPassword">
-    </div>
-
-    <div class="form-group">
-      <label for="email" class="required">Email</label>
-      <input type="email" id="email" placeholder="Enter email" value="" name="email" required>
-    </div>
-
-    <div class="form-group">
-      <label for="fullname" class="required">Full Name</label>
-      <input type="text" id="fullname" placeholder="Enter full name" value="" name="fullName">
-    </div>
-
-    <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save</button>
-  </form>
-<?php 
-
-
-    echo (new Footer('script', 'chart.umd.min'))->Render();
-
-
-?>
 
 
 ==================================================
@@ -349,25 +226,218 @@ use Views\Layouts\Head;
 
 
 ==================================================
+=== FILE: ./Views/Pages/Members/MemberManage.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
+
+// دالة مساعدة مختصرة للترميز الآمن
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Add Member', 'addMember'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
+
+?>
+<div class="container">
+    <h1>لوحة إدارة الأعضاء</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>#ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Full Name</th>
+          <th>Date Register</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+       <?php foreach ($rows as $row): ?>
+        <tr>
+          <td><?php echo e($row['UserID']); ?></td>
+          <td><?php echo e($row['Username']); ?></td>
+          <td><?php echo e($row['Email']); ?></td>
+          <td><?php echo e($row['FullName']); ?></td>
+          <td><?php echo e($row['Date_Reg']); ?></td>
+          <td>
+            <a class='btn-blue' href="<?php echo BASE_URL . 'members/' . e($row['UserID']) . '/edit'; ?>" class="table-control">Edit</a>
+            <?php if($row['RegStatus'] == 0){ ?>
+              <a class='btn-green' href="<?php echo BASE_URL . 'members/' . e($row['UserID']) . '/accept'; ?>" class="table-control">Accept</a>
+            <?php } ?>
+            <a class='btn-red' href="<?php echo BASE_URL . 'members/' . e($row['UserID']) . '/delete'; ?>" class="table-control">Delete</a>
+          </td>
+        </tr>
+       <?php endforeach; ?>
+      </tbody>
+    </table>
+    <button class="add-member">+ إضافة عضو جديد</button>
+</div>
+<?php 
+echo (new Footer('script', 'chart.umd.min'))->Render();
+?>
+
+
+
+==================================================
+=== FILE: ./Views/Pages/Members/AddMember.php
+==================================================
+<?php
+
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
+use Services\CSRFToken;
+
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Add Member', 'addMember'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
+
+?>
+<form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/insert'; ?>">
+  <h2><i class="fa fa-user-edit"></i> Add a Member</h2>
+
+  <div class="form-group">
+    <label for="username" class="required">Username</label>
+    <input type="text" id="username" placeholder="Enter username" name="username" 
+           value="<?php echo isset($row['Username']) ? e($row['Username']) : '' ?>" required>
+           <?php
+                $token = new CSRFToken();
+                $token->generateFieldToken();
+            ?>
+  </div>
+
+  <div class="form-group">
+    <label for="password" class="required">Password</label>
+    <input type="password" id="password" placeholder="Enter password" 
+           name="newPassword" value="">
+  </div>
+
+  <div class="form-group">
+    <label for="email" class="required">Email</label>
+    <input type="email" id="email" placeholder="Enter email" name="email" 
+           value="<?php echo isset($row['Email']) ? e($row['Email']) : '' ?>" required>
+  </div>
+
+  <div class="form-group">
+    <label for="fullname" class="required">Full Name</label>
+    <input type="text" id="fullname" placeholder="Enter full name" name="fullName" 
+           value="<?php echo isset($row['FullName']) ? e($row['FullName']) : '' ?>">
+  </div>
+
+  <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save</button>
+</form>
+
+<?php 
+echo (new Footer('script', 'chart.umd.min'))->Render();
+?>
+
+
+
+==================================================
+=== FILE: ./Views/Pages/Members/EditMembers.php
+==================================================
+<?php
+
+use Services\CSRFToken;
+use Views\Layouts\Footer;
+use Views\Layouts\Head;
+
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+echo ( new Head('Edit Member', 'edit') )->Render();
+?>
+<form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/update'; ?>">
+    <h2><i class="fa fa-user-edit"></i> Edit Member</h2>
+
+    <div class="form-group">
+      <label for="username" class="required">Username</label>
+      <input type="hidden" name="userid" value="<?php echo e($userRecord->userID) ?>">
+      <input type="text" id="username" placeholder="Enter username" name="username" 
+             value="<?php echo e($userRecord->username) ?>" required>
+
+             <?php
+                $token = new CSRFToken();
+               echo $token->generateFieldToken();
+            ?>
+
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" value="" name="newPassword">
+      <input type="hidden" name="oldPassword" value="<?php echo e($userRecord->password) ?>">
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="required">Email</label>
+      <input type="email" id="email" placeholder="Enter email" 
+             value="<?php echo e($userRecord->email) ?>" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="fullname" class="required">Full Name</label>
+      <input type="text" id="fullname" placeholder="Enter full name" 
+             value="<?php echo e($userRecord->fullName) ?>" name="fullName">
+    </div>
+
+    <button type="submit" class="btn-save"><i class="fa fa-save"></i> Save</button>
+</form>
+<?php
+
+    echo ( new Footer('script', '') )->Render();
+
+?>
+
+
+==================================================
 === FILE: ./Views/Pages/Items/EditItem.php
 ==================================================
 <?php
 
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
+use Services\CSRFToken;
 
- echo (new Head('Add Category', 'addMember'))->Render();
+// دالة مساعدة مختصرة للترميز الآمن
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Add Category', 'addMember'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
 
 ?>
 <div class="form-card">
   <h2><i class="fas fa-plus-circle"></i> Add New Item</h2>
-  <form method="POST" action="<?php echo BASE_URL . 'items/' . $row['Item_id'] . '/update' ?>">
+  <form method="POST" action="<?php echo BASE_URL . 'items/' . e($row['Item_id']) . '/update' ?>">
     <div class="form-group">
       <label for="item-name">Name of The Item</label>
       <div class="input-icon">
         <i class="fas fa-tag"></i>
-        <input type="text" id="item-name" name="item-name" value="<?php echo $row['Item_name'] ?>" />
-        <input type="hidden" id="item-name" name="item-id" value="<?php echo $row['Item_id'] ?>" />
+        <input type="text" id="item-name" name="item-name" value="<?php echo e($row['Item_name']) ?>" />
+        <input type="hidden" name="item-id" value="<?php echo e($row['Item_id']) ?>" />
+          <?php
+
+              $csrf = new CSRFToken();
+              echo $csrf->generateFieldToken();
+
+          ?>
       </div>
     </div>
 
@@ -375,8 +445,7 @@ use Views\Layouts\Head;
       <label for="item-description">Description of The Item</label>
       <div class="input-icon">
         <i class="fas fa-align-left"></i>
-        <textarea id="item-description" name="item-description"><?php echo $row['Item_description'] ?>
-        </textarea>
+        <textarea id="item-description" name="item-description"><?php echo e($row['Item_description']) ?></textarea>
       </div>
     </div>
 
@@ -384,7 +453,7 @@ use Views\Layouts\Head;
       <label for="item-price">Price of The Item</label>
       <div class="input-icon">
         <i class="fas fa-dollar-sign"></i>
-        <input type="text" id="item-price" min="0" name="item-price" value="<?php echo $row['Price'] ?>"/>
+        <input type="text" id="item-price" min="0" name="item-price" value="<?php echo e($row['Price']) ?>"/>
       </div>
     </div>
 
@@ -392,84 +461,76 @@ use Views\Layouts\Head;
       <label for="item-country">Country of Made </label>
       <div class="input-icon">
         <i class="fas fa-globe"></i>
-        <input type="text" id="item-country" name="item-country" value="<?php echo $row['Country_Made'] ?>" />
+        <input type="text" id="item-country" name="item-country" value="<?php echo e($row['Country_Made']) ?>" />
       </div>
     </div>
 
     <div class="form-group">
-  <label for="item-status">Status</label>
-  <div class="input-icon">
-    <i class="fas fa-info-circle"></i>
-    <select id="item-status" name="item-status" required>
-      <option value="new" <?php echo ($row['Status_Item'] === 'new') ? 'selected' : ''; ?>>New</option>
-      <option value="used" <?php echo ($row['Status_Item'] === 'used') ? 'selected' : ''; ?>>Used</option>
-      <option value="refurbished" <?php echo ($row['Status_Item'] === 'refurbished') ? 'selected' : ''; ?>>Refurbished</option>
-    </select>
-  </div>
-</div>
+      <label for="item-status">Status</label>
+      <div class="input-icon">
+        <i class="fas fa-info-circle"></i>
+        <select id="item-status" name="item-status" required>
+          <option value="new" <?php echo ($row['Status_Item'] === 'new') ? 'selected' : ''; ?>>New</option>
+          <option value="used" <?php echo ($row['Status_Item'] === 'used') ? 'selected' : ''; ?>>Used</option>
+          <option value="refurbished" <?php echo ($row['Status_Item'] === 'refurbished') ? 'selected' : ''; ?>>Refurbished</option>
+        </select>
+      </div>
+    </div>
 
-<div class="form-group">
-  <label for="item-rating">Rating</label>
-  <div class="input-icon">
-    <i class="fas fa-star"></i>
-    <select id="item-rating" name="item-rating">
-      <option value="0" <?php echo ($row['Rating'] == 0) ? 'selected' : ''; ?>>0 - No Rating</option>
-      <option value="1" <?php echo ($row['Rating'] == 1) ? 'selected' : ''; ?>>1 - Poor</option>
-      <option value="2" <?php echo ($row['Rating'] == 2) ? 'selected' : ''; ?>>2 - Fair</option>
-      <option value="3" <?php echo ($row['Rating'] == 3) ? 'selected' : ''; ?>>3 - Good</option>
-      <option value="4" <?php echo ($row['Rating'] == 4) ? 'selected' : ''; ?>>4 - Very Good</option>
-      <option value="5" <?php echo ($row['Rating'] == 5) ? 'selected' : ''; ?>>5 - Excellent</option>
-    </select>
-  </div>
-</div>
+    <div class="form-group">
+      <label for="item-rating">Rating</label>
+      <div class="input-icon">
+        <i class="fas fa-star"></i>
+        <select id="item-rating" name="item-rating">
+          <option value="0" <?php echo ($row['Rating'] == 0) ? 'selected' : ''; ?>>0 - No Rating</option>
+          <option value="1" <?php echo ($row['Rating'] == 1) ? 'selected' : ''; ?>>1 - Poor</option>
+          <option value="2" <?php echo ($row['Rating'] == 2) ? 'selected' : ''; ?>>2 - Fair</option>
+          <option value="3" <?php echo ($row['Rating'] == 3) ? 'selected' : ''; ?>>3 - Good</option>
+          <option value="4" <?php echo ($row['Rating'] == 4) ? 'selected' : ''; ?>>4 - Very Good</option>
+          <option value="5" <?php echo ($row['Rating'] == 5) ? 'selected' : ''; ?>>5 - Excellent</option>
+        </select>
+      </div>
+    </div>
 
-<div class="form-group">
-  <label for="cat-id">Category</label>
-  <div class="input-icon">
-    <i class="fas fa-folder-open"></i>
-    <select id="cat-id" name="cat-id">
-      <option value="">Select Category</option>
-      <?php
+    <div class="form-group">
+      <label for="cat-id">Category</label>
+      <div class="input-icon">
+        <i class="fas fa-folder-open"></i>
+        <select id="cat-id" name="cat-id">
+          <option value="">Select Category</option>
+          <?php
+              foreach($Cats as $Cat) {
+                  echo '<option value="' . e($Cat['ID']) . '">' . e($Cat['Name']) . '</option>';
+              }
+          ?>
+        </select>
+      </div>
+    </div>
 
-            foreach($Cats AS $Cat) {
-
-              echo '<option value='.$Cat['ID'].'>' . $Cat['Name'] . '</option>';
-
-            }
-
-      ?>
-      <!-- Add more categories dynamically from DB later -->
-    </select>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="member-id">Member</label>
-  <div class="input-icon">
-    <i class="fas fa-user"></i>
-    <select id="member-id" name="member-id">
-      <option value="">Select Member</option>
-      
-             <?php
-
-            foreach($Members AS $Member) {
-
-              echo '<option value='.$Member['UserID'].'>' . $Member['Username'] . '</option>';
-
-            }
-
-      ?>
-
-    </select>
-  </div>
-</div>
-
+    <div class="form-group">
+      <label for="member-id">Member</label>
+      <div class="input-icon">
+        <i class="fas fa-user"></i>
+        <select id="member-id" name="member-id">
+          <option value="">Select Member</option>
+          <?php
+              foreach($Members as $Member) {
+                  echo '<option value="' . e($Member['UserID']) . '">' . e($Member['Username']) . '</option>';
+              }
+          ?>
+        </select>
+      </div>
+    </div>
 
     <button type="submit" class="submit-btn">
       <i class="fas fa-edit"></i> Edit Item
     </button>
   </form>
 </div>
+
+<?php
+echo (new Footer('script', 'chart.umd.min'))->Render();
+?>
 
 
 
@@ -478,115 +539,54 @@ use Views\Layouts\Head;
 ==================================================
 <?php
 
+use Core\Helper\FlashMessage;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
 
- echo (new Head('Add Category', 'addMember'))->Render();
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Add Category', 'addMember'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
 
 ?>
 <div class="form-card">
   <h2><i class="fas fa-plus-circle"></i> Add New Item</h2>
   <form method="POST" action="">
+    <!-- باقي الحقول كما هي -->
+    
     <div class="form-group">
-      <label for="item-name">Name of The Item <span>*</span></label>
+      <label for="cat-id">Category <span>*</span></label>
       <div class="input-icon">
-        <i class="fas fa-tag"></i>
-        <input type="text" id="item-name" required name="item-name"/>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="item-description">Description of The Item <span>*</span></label>
-      <div class="input-icon">
-        <i class="fas fa-align-left"></i>
-        <textarea id="item-description" required name="item-description"></textarea>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="item-price">Price of The Item <span>*</span></label>
-      <div class="input-icon">
-        <i class="fas fa-dollar-sign"></i>
-        <input type="number" id="item-price" min="0" required name="item-price"/>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="item-country">Country of Made <span>*</span></label>
-      <div class="input-icon">
-        <i class="fas fa-globe"></i>
-        <input type="text" id="item-country" name="item-country" required />
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="item-status">Status <span>*</span></label>
-      <div class="input-icon">
-        <i class="fas fa-info-circle"></i>
-        <select id="item-status" name="item-status" required>
-          <option value="new">New</option>
-          <option value="used">Used</option>
-          <option value="refurbished">Refurbished</option>
+        <i class="fas fa-folder-open"></i>
+        <select id="cat-id" name="cat-id" required>
+          <option value="">Select Category</option>
+          <?php
+              foreach($Cats as $Cat) {
+                  echo '<option value="' . e($Cat['ID']) . '">' . e($Cat['Name']) . '</option>';
+              }
+          ?>
         </select>
       </div>
     </div>
 
     <div class="form-group">
-  <label for="item-rating">Rating <span>*</span></label>
-  <div class="input-icon">
-    <i class="fas fa-star"></i>
-    <select id="item-rating" name="item-rating" required>
-      <option value="0">0 - No Rating</option>
-      <option value="1">1 - Poor</option>
-      <option value="2">2 - Fair</option>
-      <option value="3">3 - Good</option>
-      <option value="4">4 - Very Good</option>
-      <option value="5">5 - Excellent</option>
-    </select>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="cat-id">Category <span>*</span></label>
-  <div class="input-icon">
-    <i class="fas fa-folder-open"></i>
-    <select id="cat-id" name="cat-id" required>
-      <option value="">Select Category</option>
-      <?php
-
-            foreach($Cats AS $Cat) {
-
-              echo '<option value='.$Cat['ID'].'>' . $Cat['Name'] . '</option>';
-
-            }
-
-      ?>
-      <!-- Add more categories dynamically from DB later -->
-    </select>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="member-id">Member <span>*</span></label>
-  <div class="input-icon">
-    <i class="fas fa-user"></i>
-    <select id="member-id" name="member-id" required>
-      <option value="">Select Member</option>
-      
-             <?php
-
-            foreach($Members AS $Member) {
-
-              echo '<option value='.$Member['UserID'].'>' . $Member['Username'] . '</option>';
-
-            }
-
-      ?>
-
-    </select>
-  </div>
-</div>
-
+      <label for="member-id">Member <span>*</span></label>
+      <div class="input-icon">
+        <i class="fas fa-user"></i>
+        <select id="member-id" name="member-id" required>
+          <option value="">Select Member</option>
+          <?php
+              foreach($Members as $Member) {
+                  echo '<option value="' . e($Member['UserID']) . '">' . e($Member['Username']) . '</option>';
+              }
+          ?>
+        </select>
+      </div>
+    </div>
 
     <button type="submit" class="submit-btn">
       <i class="fas fa-plus"></i> Add Item
@@ -601,56 +601,60 @@ use Views\Layouts\Head;
 ==================================================
 <?php
 
-use Core\Helper\URL;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
 
-    echo ( new Head('Categories', '') )->Render(); ?>
+// دالة مساعدة مختصرة
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
 
-    <main class="all-categories">
-       
+echo ( new Head('Categories', '') )->Render();
 
-        <?php 
-        
-                  foreach($rows as $row) {
-                    echo '<div class="cat-section">';
-                    echo '<h4>' . $row['Name'] . '</h4>';
-                        echo '<a href="categories/' . $row['ID'] . '/edit">edit</a> <a href="categories/' . $row['ID'] . '/delete">delete</a>';
-                    echo '<div class="cat">';
-                   
-                    foreach($items as $item) {
-
-                        if($row['ID'] == $item['ICI']) {
-                            echo '<div>' . $item['Name'] . '</div>';
-                        }
-
-                    }
-
-                    echo '<p>'. $row['Description'] .'</p>';
-                    echo '<div class="cat-config">';
-                        echo $row['Order'];
-                        echo $row['Visibility'];
-                        echo $row['Allow_Comment'];
-                        echo $row['Allow_Ads'];
-                    echo '</div>';
-
-                    echo '<a href="" class="cat-view">View</a>';
-                    echo ' </div>';
-
-                  }      
-        
-        ?>
-        </div>
-
-    </main>
-
-
-
-<?php
-
-    echo ( new Footer('script', '') )->Render();
+FlashMessage::init();
+FlashMessage::display();
 
 ?>
+
+<main class="all-categories">
+
+    <?php 
+        foreach($rows as $row) {
+            echo '<div class="cat-section">';
+            echo '<h4>' . e($row['Name']) . '</h4>';
+            echo '<a href="categories/' . e($row['ID']) . '/edit">edit</a> 
+                  <a href="categories/' . e($row['ID']) . '/delete">delete</a>';
+            
+            echo '<div class="cat">';
+            
+            foreach($items as $item) {
+                if($row['ID'] == $item['ICI']) {
+                    echo '<div>' . e($item['Name']) . '</div>';
+                }
+            }
+
+            echo '<p>' . e($row['Description']) . '</p>';
+            
+            echo '<div class="cat-config">';
+                echo e($row['Order']);
+                echo e($row['Visibility']);
+                echo e($row['Allow_Comment']);
+                echo e($row['Allow_Ads']);
+            echo '</div>';
+
+            echo '<a href="" class="cat-view">View</a>';
+            echo '</div>';
+        }      
+    ?>
+    </div>
+
+</main>
+
+<?php
+echo ( new Footer('script', '') )->Render();
+?>
+
 
 
 ==================================================
@@ -660,8 +664,12 @@ use Views\Layouts\Head;
 
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
 
  echo (new Head('Add Category', 'addMember'))->Render();
+
+        FlashMessage::init();
+        FlashMessage::display();
 
 ?>
 <form class="container" method="POST" action="<?php echo BASE_URL . 'categories/add'; ?>">
@@ -759,38 +767,55 @@ use Views\Layouts\Head;
 
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\FlashMessage;
+use Services\CSRFToken;
 
- echo (new Head('Add Category', 'addMember'))->Render();
+# helper Func
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Add Category', 'addMember'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
 
 ?>
-<form class="container" method="POST" action="<?php echo BASE_URL . 'categories/' . $rows->ID . '/update' ?>">
+<form class="container" method="POST" action="<?php echo BASE_URL . 'categories/' . e($rows->ID) . '/update' ?>">
 <div class="card">
   <div class="card-header">
     <h2>Edit Category</h2>
   </div>
-  <!-- ضع العناصر التالية داخل هذه البطاقة -->
 </div>
+
 <div class="field">
   <label class="label">
     Category Name
     <span class="req" aria-hidden="true">*</span>
   </label>
-  <input type="text" class="input" placeholder="" name="name" value="<?php echo $rows->Name ?>">
-  <input type="hidden" name="id" value="<?php echo $rows->ID ?>">
+  <input type="text" class="input" name="name" value="<?php echo e($rows->Name) ?>">
+  <input type="hidden" name="id" value="<?php echo e($rows->ID) ?>">
+        <?php
+
+              $csrf = new CSRFToken();
+              echo $csrf->generateFieldToken();
+
+        ?>
 </div>
+
 <div class="field">
   <label class="label">Description Category</label>
-  <textarea class="textarea" rows="3" placeholder="Describe" name="description">
-    <?php echo $rows->Description ?></textarea>
+  <textarea class="textarea" rows="3" name="description"><?php echo e($rows->Description) ?></textarea>
 </div>
+
 <div class="field">
   <label class="label">Sort</label>
   <div class="number-wrap">
-    <input type="number" class="input number-input" min="0" step="1" placeholder="ex: 10" name="order" value="<?php echo $rows->Order ?>">
+    <input type="number" class="input number-input" min="0" step="1" name="order" value="<?php echo e($rows->Order) ?>">
     <span class="suffix">#</span>
   </div>
-
 </div>
+
 <div class="field">
   <label class="label">Visibility</label>
   <div class="radio-group">
@@ -838,19 +863,18 @@ use Views\Layouts\Head;
     </label>
   </div>
 </div>
+
 <div class="actions">
   <button type="submit" class="btn-primary">
     Update Category
   </button>
 </div>
 </form>
+
 <?php 
-
-
-    echo (new Footer('script', 'chart.umd.min'))->Render();
-
-
+echo (new Footer('script', 'chart.umd.min'))->Render();
 ?>
+
 
 
 ==================================================
@@ -879,8 +903,8 @@ use Core\Interfaces\ILayouts;
         {
             return <<< HTML
             </body>
-                <script src="{$this->charts}"></script>
-                <script src="{$this->js}" type="module"></script>
+                <script src="{$this->charts}" type="module" defer></script>
+                <script src="{$this->js}" type="module" defer></script>
             </html>
             HTML;    
         }
@@ -1061,7 +1085,7 @@ use Views\Layouts\Footer;
     <a href="/logout">logout</a>
 </aside>
 
-<?php echo (new Footer('script', 'echarts.min'))->Render(); ?>
+<?php echo (new Footer('script', 'chart.umd.min'))->Render(); ?>
 
 
 ==================================================
@@ -1125,14 +1149,12 @@ use Controllers\ItemController;
 use Controllers\MembersController;
 use Core\Helper\URL;
 use Core\Router\Router;
+use Middleware\VerifyCsrfToken;
 use Services\SessionsServices;
 
-// إنشاء الراوتر
 $router = new Router();
 
-/**
- * صفحة تسجيل الدخول
- */
+
 $router->add('login', function() {
     $auth = new AuthController();
     $auth->login();
@@ -1141,9 +1163,7 @@ $router->add('/', function() {
     $auth = new AuthController();
     $auth->login();
 });
-/**
- * تسجيل الخروج
- */
+
 $router->add('logout', function() {
     $session = new SessionsServices();
     $session->start();
@@ -1193,11 +1213,15 @@ $router->add('members/{id}/activate', function($id) {
     $members = new MembersController();
     $members->acceptUser($id);
 });
+$router->add('members/update', function() {
+    $members = new MembersController();
+    $members->update();
+});
 
 $router->add('api/getUsersWithDates', function() {
 
-    $dashboard = new DashboardController();
-    $dashboard->getUsersWithDates();
+   $api = new DashboardController();
+   $api->getUsersWithDates();
 
 });
 
@@ -1212,6 +1236,13 @@ $router->add('api/getCountryMade', function() {
 
     $dashboard = new DashboardController();
     $dashboard->getCountryMade();
+
+});
+
+$router->add('api/searchData', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->searchBox();
 
 });
 
@@ -1266,13 +1297,13 @@ $router->add('items/{id}/delete', function($id) {
     $item->delete($id);
 });
 
-$router->add('items/{id}/delete', function($id) {
+$router->add('items/manage', function($id) {
     $item = new ItemController();
-    $item->delete($id);
+    $item->index();
 });
 
 $router->add('test', function() {
-        include BASE_PATH . '/Views/Layouts/Sidebar.php';
+        include BASE_PATH . '/Views/Pages/test.php';
 });
 
 
@@ -1280,8 +1311,31 @@ $router->add('test', function() {
  * صفحة الخطأ 404
  */
 $router->add('404', function() {
-    include BASE_PATH . 'Views/Pages/404.php';
+    include BASE_PATH . '/Views/Pages/Main/404.php';
 });
+
+
+
+$middleware = new VerifyCsrfToken();
+
+$middleware->handle(function () {
+    // هنا يتابع الراوتر إلى الـ controllers
+    // مثال بسيط:
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+
+    if ($uri === '/profile/update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        // تنفيذ الأكشن بعد مرور الميدلوير
+        echo 'تم التحديث بنجاح';
+        return;
+    }
+
+});
+
+
+
+
+
+
 
 // تنفيذ التوجيه
 $router->dispatch();
@@ -1289,57 +1343,90 @@ $router->dispatch();
 
 
 ==================================================
-=== FILE: ./APIs/getItemsCountWithCats.php
+=== FILE: ./Middleware/VerifyCsrfToken.php
 ==================================================
-<?php 
-
-    namespace APIs;
-    use Repositories\UserRepository;
-    use Core\Database\DBConnection;
-    use Repositories\ItemRepository;
-
-    $repo = new ItemRepository( ( new DBConnection() )->getConnection() );
-        $records = $repo->getItemWithCatsAnalisys();
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($records, JSON_UNESCAPED_UNICODE);
-
-?>
+<?php
 
 
-==================================================
-=== FILE: ./APIs/getUsersWithDates.php
-==================================================
-<?php 
+    namespace Middleware;
 
-    namespace APIs;
-    use Repositories\UserRepository;
-    use Core\Database\DBConnection;
+use Services\CSRFToken;
+
+    class VerifyCsrfToken {
 
 
+         protected array $except = [
+        // '/webhook/provider-x',
+        // '/api/public/*',
+        ];
 
 
-    $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-        $records = $repo->getUsersAndDates();
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($records, JSON_UNESCAPED_UNICODE);
+        public function handle(callable $next)
+    {
+        $csrf = new CSRFToken();
+        $csrf->ensureToken();
 
-?>
+        $server = $_SERVER;
+        $post = $_POST;
+        $headers = $this->getHeaders();
+
+        $uri = parse_url($server['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+        if ($this->isExcept($uri)) {
+            return $next();
+        }
+
+        if (!$csrf->validateRequest($server, $post, $headers)) {
+            http_response_code(419);
+            echo $this->expiredPage();
+            return null;
+        }
+
+        return $next();
+    }
+
+    protected function isExcept(string $uri): bool
+    {
+        foreach ($this->except as $pattern) {
+            // دعم wildcards البسيط
+            $regex = '#^' . str_replace(['*'], ['.*'], $pattern) . '$#';
+            if (preg_match($regex, $uri)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function getHeaders(): array
+    {
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if (str_starts_with($key, 'HTTP_')) {
+                $name = str_replace('_', '-', substr($key, 5));
+                $headers[$name] = $value;
+            }
+        }
+        return $headers;
+    }
+
+    protected function expiredPage(): string
+    {
+        return '<!doctype html><html lang="ar"><head><meta charset="utf-8"><title>419 - انتهت الصفحة</title></head><body style="font-family:sans-serif;padding:2rem"><h1>419 - انتهت الجلسة</h1><p>انتهت صلاحية الطلب أو فشل التحقق من CSRF. يرجى إعادة تحميل الصفحة والمحاولة مجددًا.</p></body></html>';
+    }
+}
 
 
-==================================================
-=== FILE: ./APIs/getCountryMadeAPI.php
-==================================================
-<?php 
 
-    namespace APIs;
-    use Repositories\UserRepository;
-    use Core\Database\DBConnection;
-    use Repositories\ItemRepository;
 
-    $repo = new ItemRepository( ( new DBConnection() )->getConnection() );
-        $records = $repo->getCountryMadeAPI();
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($records, JSON_UNESCAPED_UNICODE);
+
+
+
+
+
+
+
+
+
+
 
 ?>
 
@@ -1426,7 +1513,7 @@ require_once BASE_PATH . 'Core/Autoloader/Autoloader.php';
 
         public function start(): bool;
         public function set(string $key, string $value): bool;
-        public function get(string $key) : string;
+        public function get(string $key) : mixed;
         public function has(string $key): bool;
         public function remove(string $key): void;
         public function destroy(): bool;
@@ -1621,7 +1708,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// BASE_PATH = جذر المشروع
+// BASE_PATH = Root
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
 }
@@ -1681,6 +1768,8 @@ class Autoloader {
 <?php
 namespace Core\Router;
 
+use Core\Helper\URL;
+
 class Router {
     protected array $routes = [];
 
@@ -1734,7 +1823,7 @@ class Router {
 
         // إذا لم يوجد تطابق → 404
         http_response_code(404);
-        echo "<h2>404 - Page Not Found</h2>";
+        URL::redirect('404');
     }
 }
 
@@ -1835,6 +1924,7 @@ abstract class AbstractDBConnection {
    namespace Core\Abstracts;
 
 use Core\Interfaces\ISessions;
+use Exception;
 
 abstract class AbstractSessions implements ISessions {
 
@@ -1847,10 +1937,10 @@ abstract class AbstractSessions implements ISessions {
         $httpOnly = true;
 
         if (session_status() === PHP_SESSION_ACTIVE) {
-            return false; // الجلسة شغالة بالفعل
+            return false; // Active Current Session
         }
 
-        // إعدادات أمان إضافية
+        // Additianl Settings
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.use_trans_sid', '0');
@@ -1867,6 +1957,16 @@ abstract class AbstractSessions implements ISessions {
         return true;
     }
 
+    public function checkIfExist() : bool {
+
+        if(session_status() === PHP_SESSION_ACTIVE) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public function set(string $key, string $value) : bool {
 
         if(session_status() !== PHP_SESSION_ACTIVE) $this->start();
@@ -1877,7 +1977,7 @@ abstract class AbstractSessions implements ISessions {
 
     }
 
-    public function get(string $key) : string {
+    public function get(string $key) : mixed {
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             $this->start();
@@ -1887,7 +1987,7 @@ abstract class AbstractSessions implements ISessions {
             return $_SESSION[$key];
         }
 
-        return 'No Session Data..';
+        return null;
     }
 
     public function has(string $key): bool {
@@ -2050,6 +2150,47 @@ abstract class AbstractSessions implements ISessions {
 
 
 ==================================================
+=== FILE: ./Model/Item.php
+==================================================
+<?php
+
+namespace Model;
+
+class Item
+{
+    public int $item_id;
+    public string $item_name;
+    public string $item_description;
+    public string $price;
+    public string $add_date;
+    public string $country_made;
+    public ?string $image;
+    public string $status_item;
+    public ?int $rating;
+    public ?int $cat_id;
+    public ?int $member_id;
+    public int $approve;
+
+    public function __construct(array $data = [])
+    {
+        $this->item_id         = $data['item_id'] ?? 0;
+        $this->item_name       = $data['item_name'] ?? '';
+        $this->item_description= $data['item_description'] ?? '';
+        $this->price           = $data['price'] ?? '0';
+        $this->add_date        = $data['add_date'] ?? date('Y-m-d H:i:s');
+        $this->country_made    = $data['country_made'] ?? '';
+        $this->image           = $data['image'] ?? null;
+        $this->status_item     = $data['status_item'] ?? '';
+        $this->rating          = isset($data['rating']) ? (int)$data['rating'] : null;
+        $this->cat_id          = isset($data['cat_id']) ? (int)$data['cat_id'] : null;
+        $this->member_id       = isset($data['member_id']) ? (int)$data['member_id'] : null;
+        $this->approve         = isset($data['approve']) ? (int)$data['approve'] : 0;
+    }
+}
+
+
+
+==================================================
 === FILE: ./Language/en.php
 ==================================================
 <?php
@@ -2068,6 +2209,116 @@ abstract class AbstractSessions implements ISessions {
         'editmember' => 'Member Edit',
         'settings' => 'settings',
     ];
+
+
+
+
+
+
+
+?>
+
+
+==================================================
+=== FILE: ./Services/CSRFToken.php
+==================================================
+<?php
+
+    namespace Services;
+
+    use Services\SessionsServices;
+
+    class CSRFToken {
+
+        protected string $sessionKey = 'csrf_token';
+        protected int $ttlTime = 3600; # 1 Hour - TTL = Time To Live
+        protected string $timeStampKey = 'csrf_token_ts';
+
+
+        public function ensureToken() : void {
+
+            if(session_status() !== PHP_SESSION_ACTIVE) {
+
+                session_start();
+
+                $expired = isset($_SESSION[$this->timeStampKey]) && 
+                ( time() - $_SESSION[$this->timeStampKey] > $this->ttlTime );
+
+                if(empty($_SESSION[$this->timeStampKey]) || $expired) {
+                    $session = new SessionsServices();
+                    $session->set($this->sessionKey, bin2hex(random_bytes(32)));
+                    $session->set($this->timeStampKey, time());
+                }
+
+            }
+
+        }
+
+        public function getToken() : mixed {
+
+            $this->ensureToken();
+
+            return $_SESSION[$this->sessionKey];
+
+        }
+
+        public function rotateToken() : mixed {
+
+            $session = new SessionsServices();
+            $bool = $session->checkIfExist();
+
+            if($bool) {
+
+                $session->set($this->sessionKey, bin2hex(random_bytes(32)));
+                $session->set($this->timeStampKey, time());
+
+            }
+
+            return $_SESSION[$this->sessionKey];
+
+        }
+
+        public function generateFieldToken(string $name = '__TOKEN__') : string {
+
+            $token = htmlspecialchars($this->getToken(), ENT_QUOTES, 'UTF-8');
+            $field = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+
+            return '<input type="hidden" ' . 'name="' . $field . '" value="' . $token . '">'; 
+
+        }
+        public function validateRequest(array $server, array $post, array $headers = [], string $paramName = '__TOKEN__'): bool {
+            
+            $method = strtoupper($server['REQUEST_METHOD'] ?? 'GET');
+            if(in_array($method, ['GET', 'HEAD', 'OPTION'])) {
+                return true;
+            }
+
+            $tokenForm = isset($post[$paramName]) ? (string)$post[$paramName] : null;
+            $tokenHeader = isset($headers['X-CSRF-TOKEN']) ? (string)$headers['X-CSRF-TOKEN'] : null;
+
+            if (session_status() !== PHP_SESSION_ACTIVE) {
+                session_start();
+            }
+            
+            $sessionToken = $_SESSION[$this->sessionKey] ?? null;
+
+            $match = ($tokenForm && hash_equals($sessionToken ?? '', $tokenForm)) ||
+            ($tokenHeader && hash_equals($sessionToken ?? '', $tokenHeader));
+
+            if (!$match) {
+                return false;
+            }
+
+            return true;
+
+
+        }
+
+
+    }
+
+
+
 
 
 
@@ -2102,15 +2353,14 @@ use Repositories\UserRepository;
             $row = $this->repo->findByUsername($username);
 
             if (!$row) {
-                Alert::Print('error Verify Login', 'error');
                 return false;
             };
 
             if (password_verify($password, $row->password)) {
-                
-                return $row ?? true;
+                return $row;
             }
 
+            return false;
 
         }
 
@@ -2125,6 +2375,77 @@ use Repositories\UserRepository;
 
 
 ==================================================
+=== FILE: ./Services/APIServices.php
+==================================================
+<?php
+namespace Services;
+
+use Repositories\UserRepository;
+use Core\Database\DBConnection;
+use Repositories\CategoryRepository;
+use Repositories\ItemRepository;
+use PDO;
+
+class APIServices {
+    private UserRepository $userRepo;
+    private ItemRepository $itemRepo;
+    private CategoryRepository $categoryRepo;
+
+    public function __construct() {
+        $this->userRepo = new UserRepository((new DBConnection())->getConnection());
+        $this->itemRepo = new ItemRepository((new DBConnection())->getConnection());
+        $this->categoryRepo = new CategoryRepository((new DBConnection())->getConnection());
+    }
+
+    public function getUsersWithDates(): array {
+        return $this->userRepo->getUsersAndDates();
+    }
+
+    public function getItemsCountWithCats(): array {
+        return $this->itemRepo->getItemFromCategories();
+    }
+
+    public function getCountryMade(): array {
+        return $this->itemRepo->getCountryMadeAPI();
+    }
+
+    public function searchData(): array {
+                
+        $Conn = (new DBConnection())->getConnection();
+        $q    = $_GET['q'] ?? '';
+        $resulte = [];
+        $SQL1 = 'SELECT `Username` FROM users WHERE Username LIKE ?';
+        $SQL2 = 'SELECT `Name` FROM categories WHERE `Name` LIKE ?';
+        $SQL3 = 'SELECT `Item_name` FROM items WHERE `Item_name` LIKE ?';
+
+        $stmt = $Conn->prepare($SQL1);
+        $stmt->execute(["%{$q}%"]);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt2 = $Conn->prepare($SQL2);
+        $stmt2->execute(["%{$q}%"]);
+        $categories = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt3 = $Conn->prepare($SQL3);
+        $stmt3->execute(["%{$q}%"]);
+        $items = $stmt3->fetchAll(PDO::FETCH_ASSOC);
+
+        $resulte = [
+        "users" => $users,
+        "categories" => $categories,
+        "items" => $items
+        ];
+
+        return $resulte;
+
+    }
+}
+
+
+?>
+
+
+==================================================
 === FILE: ./Services/MemberService.php
 ==================================================
 <?php
@@ -2133,6 +2454,7 @@ use Repositories\UserRepository;
     use Repositories\UserRepository;
     use Core\Database\DBConnection;
     use Core\Helper\Alert;
+use Core\Helper\FlashMessage;
 
     class MemberService {
 
@@ -2160,8 +2482,6 @@ use Repositories\UserRepository;
         $password = !empty($data['newPassword'])
             ? password_hash($data['newPassword'], PASSWORD_DEFAULT)
             : $data['oldPassword'];
-
-            Alert::Print("تم التحديث بنجاح", 'success');
 
         return $this->repo->updateUser($userid, $username, $password, $email, $fullname);
     }
@@ -2250,12 +2570,6 @@ use Repositories\CategoryRepository;
 
 
 ==================================================
-=== FILE: ./Services/CurrencyAPIService.php
-==================================================
-
-
-
-==================================================
 === FILE: ./Services/ValidationService.php
 ==================================================
 <?php
@@ -2331,47 +2645,70 @@ class ValidationService {
 namespace Controllers;
 
 use Core\Database\DBConnection;
+use Core\Helper\Alert;
 use Services\AuthLogin;
 use Services\SessionsServices;
 use Core\Helper\URL;
 use Repositories\UserRepository;
+use Views\Layouts\Footer;
 use Views\Layouts\Head;
-class AuthController {
-    private AuthLogin $auth;
 
-    public function __construct()
+
+class AuthController {
+
+    private AuthLogin $auth;
+    private SessionsServices $session;
+
+    public function __construct(AuthLogin $login = null)
     {
-        $this->auth = new AuthLogin((new UserRepository((new DBConnection())->getConnection())));
-        // $this->auth->
+        $this->auth = $login ?? new AuthLogin((new UserRepository((new DBConnection())->getConnection())));
+        $this->session = new SessionsServices();
+    }
+
+    public function renderLoginView(string $message = '', string $type = 'info') {
+
+        echo (new Head('Login System', 'login'))->Render();
+        
+        $alertMessage = !empty($message) ? Alert::Print($message, $type) : '';
+
+        include BASE_PATH . '/Views/Pages/Main/Login.php';
+
+        echo (new Footer('script', ''))->Render();
+
     }
 
     public function login() {
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
 
-            $row = $this->auth->verifyLogin($username, $password);
-            if ($row) {
-                // بدء الجلسة
-                
-                $session = new SessionsServices();
-                $session->start();
-                $session->set('username', $username);
-                $session->set('UserID', $row->userID);
+            $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
+            $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
 
-                // التوجيه إلى لوحة التحكم
-                URL::redirect('dashboard');
-                exit;
+            if(!empty($username) && !empty($password)) {
+
+                $row = $this->auth->verifyLogin($username, $password);
+
+                if ($row) {
+                    
+                    $this->session->start();
+                    $this->session->set('username', $username);
+                    $this->session->set('UserID', $row->userID);
+    
+                    # Go to Dashboard
+    
+                    URL::redirect('dashboard');
+                    
+                } else {
+                    $this->renderLoginView('Invalid Username OR Password');
+                }
+
             } else {
-                // echo (new Head('Login System'))->Render();
-
-                echo "<p style='color:red'>Invalid credentials</p>";
-                include BASE_PATH . 'Views/Pages/Login.php';
+                $this->renderLoginView('Error');
             }
+
         } else {
-            // أول مرة يفتح الصفحة → عرض الفورم
-                echo (new Head('Login System', 'login'))->Render();
-            include BASE_PATH . 'Views/Pages/Login.php';
+            // in First Time: Show Login Form
+            $this->renderLoginView('');
         }
     }
 }
@@ -2385,19 +2722,15 @@ class AuthController {
 
 namespace Controllers;
 
-use Core\Database\DBConnection;
 use Core\Helper\FlashMessage;
 use Core\Helper\URL;
-use Model\Category;
 use Repositories\CategoryRepository;
 use Repositories\ItemRepository;
 use Services\SessionsServices;
+use Services\CSRFToken;
 use Exception;
 
 class CategoriesController {
-
-
-
 
     public function __construct()
     {
@@ -2408,10 +2741,7 @@ class CategoriesController {
         // $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
         // $rows = $repo->findById(1);
 
-        FlashMessage::init();
-        FlashMessage::display();
-
-        $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+        $repo = new CategoryRepository();
         $rows = $repo->showAllCategories('DESC');
 
         $repoItem = new ItemRepository();
@@ -2421,75 +2751,71 @@ class CategoriesController {
     }
 
     public function insert() {
-        
-        
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
-            $categoryData = [
-                'name'        => trim($_POST['name'] ?? ''),
-                'description' => trim($_POST['description'] ?? ''),
-                'order'       => (int)($_POST['order'] ?? 0),
-                'visible'     => (int)($_POST['visible'] ?? 1),
-                'comments'    => (int)($_POST['comments'] ?? 1),
-                'ads'         => (int)($_POST['ads'] ?? 1),
-            ];
-            
-            $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
-            if($repo->isExist($categoryData['name'])) {
-                    FlashMessage::init();
-                    FlashMessage::warning('This Category Already Exists');
-                    FlashMessage::display();
-                    echo 'Samer 404';
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $categoryData = [
+            'name'        => trim($_POST['name'] ?? ''),
+            'description' => trim($_POST['description'] ?? ''),
+            'order'       => (int)($_POST['order'] ?? 0),
+            'visible'     => (int)($_POST['visible'] ?? 1),
+            'comments'    => (int)($_POST['comments'] ?? 1),
+            'ads'         => (int)($_POST['ads'] ?? 1),
+        ];
+
+        $repo = new CategoryRepository();
+
+        if ($repo->isExist($categoryData['name'])) {
+            FlashMessage::init();
+            FlashMessage::warning('This Category Already Exists');
+            URL::redirect('categories/add');
+        } else {
+            $status = $repo->insert($categoryData);
+            if ($status) {
+                FlashMessage::init();
+                FlashMessage::success("Category Added");
+                URL::redirect('categories');
             } else {
-                $status = $repo->insert($categoryData);
-
-                if($status) {
-                    FlashMessage::init();
-                    FlashMessage::success("Category Added");
-                    URL::redirect('categories');
-                } else {
-                    FlashMessage::init();
-                    FlashMessage::warning('Error');
-                    // URL::redirect($_SERVER['PHP_SELF']);
-                }
-
+                FlashMessage::init();
+                FlashMessage::error('Error adding category');
+                URL::redirect('categories/add');
             }
-            
         }
-        include BASE_PATH . '/Views/Pages/Categories/AddCategory.php';
     }
+
+    include BASE_PATH . '/Views/Pages/Categories/AddCategory.php';
+}
+
 
     public function edit($id) {
 
-        $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+        $repo = new CategoryRepository();
         $rows = $repo->findById($id);
 
         include BASE_PATH . '/Views/Pages/Categories/EditCategory.php';
 
-
-
     }
 
     public function update($id) {
+
+         $csrf = new CSRFToken();
+        
+        if(!$csrf->validateRequest($_SERVER, $_POST)) {
+            http_response_code(419);
+            FlashMessage::init();
+            FlashMessage::error('Page Expired! - ERROR 419');
+            return;
+        }
         
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             
-             $repo = new CategoryRepository( ( new DBConnection() )->getConnection() );
+             $repo = new CategoryRepository();
 
-                if($repo->isExist($_POST['name'])) {
+                if($repo->isExist($_POST['name'], $id)) {
                     FlashMessage::init();
                     FlashMessage::warning('This Category Already Exists');
-                    FlashMessage::display();
-                    echo 'Samer 404';
                 } else {
-
                     $repo->update($_POST);
-                    echo true;
                 }
-
-
         }
-
     }
 
         public function delete($id) {
@@ -2514,19 +2840,6 @@ class CategoriesController {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ?>
 
 
@@ -2535,185 +2848,146 @@ class CategoriesController {
 ==================================================
 <?php
 
-
 namespace Controllers;
 
 use Core\Database\DBConnection;
-use Core\Helper\Alert;
+use Core\Helper\FlashMessage;
 use Core\Helper\URL;
-use Model\User;
-use PDO;
 use Repositories\UserRepository;
+use Services\CSRFToken;
 use Services\MemberService;
 use Services\SessionsServices;
-use Views\Layouts\Footer;
-use Views\Layouts\Head;
-use Core\Helper\FlashMessage;
-use Soap\Url as SoapUrl;
 
-    class MembersController {
+class MembersController {
 
-        private MemberService $Service;
+    private MemberService $Service;
+    private UserRepository $repo;
 
-
-        public function __construct()
-        {
-            $this->Service = new MemberService();
-        }
-
-
-
-        public function index() {       
-                
-                    FlashMessage::init();
-                    FlashMessage::display();
-
-                    $users = new UserRepository(( new DBConnection())->getConnection() );
-                    $rows = $users->getAllMembers();
-
-                    include BASE_PATH . '/Views/Pages/MemberManage.php';
+    public function __construct()
+    {
+        $this->Service = new MemberService();
+        $this->repo = new UserRepository((new DBConnection())->getConnection());
     }
 
+    public function index() {
+        $rows = $this->repo->getAllMembers();
+        include BASE_PATH . '/Views/Pages/Members/MemberManage.php';
+    }
 
-        public function getPendingUsers() {
-            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-            $rows = $repo->getPendingUser();
-            include BASE_PATH . '/Views/Pages/MemberManage.php';
-        }
+    public function getPendingUsers() {
+        $rows = $this->repo->getPendingUser();
+        include BASE_PATH . '/Views/Pages/MemberManage.php';
+    }
 
-        public function acceptUser($id) : void {
+    public function acceptUser(int $id): void {
+        $this->repo->acceptUser($id);
+        FlashMessage::init();
+        FlashMessage::success('The user has been accepted');
+        URL::redirect('members');
+    }
 
-            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-            $rows = $repo->acceptUser($id);
-            FlashMessage::init();
-            FlashMessage::success('The User has Accepted');
-            URL::redirect('members');
-
-        }
-
-        public function edit(int $id) {
-
-        echo (new Head('Edit Member', 'editmembers'))->Render();
+    public function edit(int $id) {
 
         $user = $this->Service->getMemberById($id);
 
         if ($user) {
-
-            $rows = $user;
-
-            include BASE_PATH . 'Views/Pages/Members.php';
-
+            $userRecord = $user;
+            include BASE_PATH . '/Views/Pages/Members/EditMembers.php';
         } else {
-
-            Alert::Print("المستخدم غير موجود", 'error');
+            FlashMessage::init();
+            FlashMessage::error("المستخدم غير موجود");
             URL::redirect('404');
         }
-
-        echo (new Footer('script', ''))->Render();
     }
 
+    public function delete(int $id) {
+    // Dont delete Myself :o
+    if ($id == $_SESSION['UserID']) {
+        FlashMessage::error('You cannot delete your own account!');
+        URL::redirect('members');
+        return;
+    }
 
-        public function delete(int $id) {
+    if ($this->repo->deleteUser($id)) {
+        FlashMessage::init();
+        FlashMessage::success('The user has been deleted');
+    } else {
+        FlashMessage::init();
+        FlashMessage::error('Failed to delete user or user not found');
+    }
+    
+    URL::redirect('members');
+}
 
-            $repo = new UserRepository( ( new DBConnection() )->getConnection() );
-            $repo->deleteUser($id);
-            FlashMessage::init();
-            FlashMessage::success('The User Has been deleted');
-            URL::redirect('members');
+    public function insert() {
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            $username = trim($_POST['username']);
+            $password = $_POST['newPassword'];
+            $email    = trim($_POST['email']);
+            $fullname = trim($_POST['fullName']);
+            $avatar   = null;
 
-        }
-
-        public function insert() {
-
-            $session = new SessionsServices();
-
-            if($_SERVER['REQUEST_METHOD'] === "POST") {
-                
-                $username = trim($_POST['username']);
-                $password = password_hash($_POST['newPassword'], PASSWORD_DEFAULT);
-                $email    = trim($_POST['email']);
-                $fullname = trim($_POST['fullName']);
-                $avatar   = null; // لاحقاً يمكن إضافة رفع صورة
-
-                $repo = new UserRepository((new DBConnection())->getConnection());
-
-                if ($repo->exists($username, $email)) {
-                    FlashMessage::warning('This user Already Exists');
+            if ($this->repo->exists($username, $email)) {
+                FlashMessage::init();
+                FlashMessage::warning('This user already exists');
+            } else {
+                $status = $this->repo->insertUser($username, $password, $email, $fullname, $avatar);
+                FlashMessage::init();
+                if ($status) {
+                    FlashMessage::success('Member added successfully');
                 } else {
-                    $status = $repo->insertUser($username, $password, $email, $fullname, $avatar);
-
-                    if ($status) {
-                        FlashMessage::success('This Member Was Added');
-                    } else {
-                        FlashMessage::error('Field Add User');
-                    }
+                    FlashMessage::error('Failed to add member');
                 }
-
-                URL::redirect('members');
-
             }
-            
-            include BASE_PATH . '/Views/Pages/AddMember.php';
+            URL::redirect('members');
         }
 
-       public function update() {
+        include BASE_PATH . '/Views/Pages/AddMember.php';
+    }
+
+    public function update() {
+
+        $csrf = new CSRFToken();
+        
+        if(!$csrf->validateRequest($_SERVER, $_POST)) {
+            http_response_code(419);
+            FlashMessage::init();
+            FlashMessage::error('Page Expired! - ERROR 419');
+            return;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             $errors = [];
 
-            if(empty($_POST['username']) || strlen($_POST['username']) < 10) {
-
-                $errors[] = "User Name Invalid";
-
+            if (empty($_POST['username']) || strlen($_POST['username']) < 3) {
+                $errors[] = "Invalid username";
             }
-            if(empty($_POST['email'])) {
-
-                $errors[] = "Email Name Invalid";
-
+            if (empty($_POST['email'])) {
+                $errors[] = "Invalid email";
             }
 
-            if(!empty($errors)) {
-
-                foreach($errors as $error) {
-                    Alert::Print($error, 'error');
-                    return;
+            if (!empty($errors)) {
+                FlashMessage::init();
+                foreach ($errors as $error) {
+                    FlashMessage::error($error);
                 }
-
-
-            } else {
-
-                $this->Service->updateMember($_POST);
-
+                URL::redirect('members/edit/' . ($_POST['id'] ?? 0));
+                return;
             }
 
-
-
-            // URL::redirect('members?do=manage');
+            $this->Service->updateMember($_POST);
+            FlashMessage::init();
+            FlashMessage::success('Member updated successfully');
+            URL::redirect('members');
 
         } else {
-
             URL::redirect('404');
-
         }
     }
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
+}
 
 ?>
+
 
 
 ==================================================
@@ -2721,164 +2995,152 @@ use Soap\Url as SoapUrl;
 ==================================================
 <?php
 
+namespace Controllers;
 
-    namespace Controllers;
-
-use Core\Helper\Alert;
 use Core\Helper\FlashMessage;
-use Core\Helper\URL as HelperURL;
-use Repositories\ItemRepository;
-use Services\SessionsServices;
 use Core\Helper\URL;
+use Repositories\ItemRepository;
 use Repositories\CategoryRepository;
 use Repositories\UserRepository;
-use Soap\Url as SoapUrl;
+use Services\SessionsServices;
+use Services\CSRFToken;
 
-    class ItemController {
+class ItemController {
 
-        public function __construct()
-        {
-            new SessionsServices();
-        }
-
-        public function insert() {
-            
-            $repo = new ItemRepository();
-            $Cats = $repo->getCategoriesNameAID();
-            $Members = $repo->getUsersWithID();
-
-            if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-                $required = ['item-name', 'item-description', 'item-price', 'item-country', 'item-status', 'item-rating', 'cat-id', 'member-id'];
-
-                foreach($required as $req) {
-                    if(empty($_POST[$req])) {
-                        FlashMessage::init();
-                        FlashMessage::error('Please Fill all Fields');
-                        exit;
-                    }
-                }
-
-                    $itemName = trim($_POST['item-name']);
-                    $itemDescription = trim($_POST['item-description']);
-                    $itemPrice = (float) $_POST['item-price'];
-                    $itemCountry = trim($_POST['item-country']);
-                    $itemStatus = (int) $_POST['item-status'];
-                    $itemRating = (int) $_POST['item-rating'];
-                    $catId = (int) $_POST['cat-id'];
-                    $memberId = (int) $_POST['member-id'];
-
-                if(!is_numeric($_POST['item-price']) or $_POST['item-price'] < 0) {
-                    Alert::Print('invalid price');
-                    exit;
-                }
-
-                 $repo = new ItemRepository();
-                $status = $repo->insert($itemName, $itemDescription, $itemPrice, $itemCountry, $itemStatus, $itemRating, $catId, $memberId);
-
-                if($status) {
-                    FlashMessage::init();
-                    FlashMessage::success('the item was inserted');
-                    FlashMessage::display();
-                    URL::redirect('items');
-                    exit;
-                }
-
-                }
-
-            include BASE_PATH . '/Views/Pages/Items/AddItem.php';
-
-        }
-
-        public function edit($id) {
-
-            $repo = new ItemRepository();
-            $row = $repo->findById($id);
-
-            $repo2 = new CategoryRepository();
-            $Cats = $repo2->showAllCategories();
-
-            $repo3 = new UserRepository();
-            $Members = $repo3->getAllMembers();
-
-            include BASE_PATH . '/Views/Pages/Items/EditItem.php';
-
-        }
-
-        public function update() {
-
-            if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-                 $itemName = trim($_POST['item-name']);
-                    $itemDescription = trim($_POST['item-description']);
-                    $itemPrice = (float) $_POST['item-price'];
-                    $itemCountry = trim($_POST['item-country']);
-                    $itemStatus = (int) $_POST['item-status'];
-                    $itemRating = (int) $_POST['item-rating'];
-                    $catId = (int) $_POST['cat-id'];
-                    $memberId = (int) $_POST['member-id'];
-
-                    // read the item id (expected from a hidden input in the edit form)
-                    $itemId = isset($_POST['item-id']) ? (int) $_POST['item-id'] : 0;
-
-                if(!is_numeric($_POST['item-price']) or $_POST['item-price'] < 0) {
-                    Alert::Print('invalid price');
-                    exit;
-                }
-
-                $repo = new ItemRepository();
-                $status = $repo->update($itemId, $itemName, $itemDescription, $itemPrice, $itemCountry, $itemStatus, $itemRating, $catId, $memberId);
-
-                if($status) {
-
-                    FlashMessage::init();
-                    FlashMessage::success('this item had Updated!');
-                    FlashMessage::display();
-                    URL::redirect('items');
-
-                }
-
-            }
-
-        }
-
-        public function delete($id) {
-
-            $repo = new ItemRepository();
-            $repo->delete($id);
-
-            FlashMessage::init();
-            FlashMessage::success('item had deleted');
-
-        }
-
+    public function __construct()
+    {
+        new SessionsServices();
     }
 
+    public function index() {
+        echo 'show Items';
+    }
 
+    private function getItemDataFromPost(): array
+    {
+        return [
+            'id'          => isset($_POST['item-id']) ? (int) $_POST['item-id'] : 0,
+            'name'        => trim($_POST['item-name'] ?? ''),
+            'description' => trim($_POST['item-description'] ?? ''),
+            'price'       => (float) ($_POST['item-price'] ?? 0),
+            'country'     => trim($_POST['item-country'] ?? ''),
+            'status'      => (int) ($_POST['item-status'] ?? 0),
+            'rating'      => (int) ($_POST['item-rating'] ?? 0),
+            'catId'       => (int) ($_POST['cat-id'] ?? 0),
+            'memberId'    => (int) ($_POST['member-id'] ?? 0),
+        ];
+    }
 
+    public function insert() {
+        $repo = new ItemRepository();
+        $Cats = $repo->getCategoriesNameAID();
+        $Members = $repo->getUsersWithID();
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $required = ['item-name', 'item-description', 'item-price', 'item-country', 'item-status', 'item-rating', 'cat-id', 'member-id'];
 
+            foreach ($required as $req) {
+                if (empty($_POST[$req])) {
+                    FlashMessage::init();
+                    FlashMessage::error('Please fill all fields');
+                    URL::redirect('items/add');
+                    return;
+                }
+            }
 
+            $data = $this->getItemDataFromPost();
 
+            if ($data['price'] < 0) {
+                FlashMessage::init();
+                FlashMessage::error('Invalid price');
+                URL::redirect('items/add');
+                return;
+            }
 
+            $status = $repo->insert(
+                $data['name'], $data['description'], $data['price'], $data['country'],
+                $data['status'], $data['rating'], $data['catId'], $data['memberId']
+            );
 
+            FlashMessage::init();
+            if ($status) {
+                FlashMessage::success('Item inserted successfully!');
+                URL::redirect('items');
+            } else {
+                FlashMessage::error('Failed to insert item');
+                URL::redirect('items/add');
+            }
+        }
 
+        include BASE_PATH . '/Views/Pages/Items/AddItem.php';
+    }
 
+    public function edit($id) {
+        $repo = new ItemRepository();
+        $row = $repo->findById($id);
 
+        $repo2 = new CategoryRepository();
+        $Cats = $repo2->showAllCategories();
 
+        $repo3 = new UserRepository();
+        $Members = $repo3->getAllMembers();
 
+        include BASE_PATH . '/Views/Pages/Items/EditItem.php';
+    }
 
+    public function update() {
 
+         $csrf = new CSRFToken();
+        
+        if(!$csrf->validateRequest($_SERVER, $_POST)) {
+            http_response_code(419);
+            FlashMessage::init();
+            FlashMessage::error('Page Expired! - ERROR 419');
+            return;
+        }
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = $this->getItemDataFromPost();
 
+            if ($data['price'] < 0) {
+                FlashMessage::init();
+                FlashMessage::error('Invalid price');
+                URL::redirect('items/edit/' . $data['id']);
+                return;
+            }
 
+            $repo = new ItemRepository();
+            $status = $repo->update(
+                $data['id'], $data['name'], $data['description'], $data['price'],
+                $data['country'], $data['status'], $data['rating'], $data['catId'], $data['memberId']
+            );
 
+            FlashMessage::init();
+            if ($status) {
+                FlashMessage::success('Item updated successfully!');
+                URL::redirect('items/manage');
+            } else {
+                FlashMessage::error('Failed to update item');
+            }
+        }
+    }
 
+    public function delete($id) {
+        $repo = new ItemRepository();
+        $status = $repo->delete($id);
 
-
-
+        FlashMessage::init();
+        if ($status) {
+            FlashMessage::success('Item deleted successfully!');
+        } else {
+            FlashMessage::error('Failed to delete item');
+        }
+        URL::redirect('items');
+    }
+}
 
 ?>
+
 
 
 ==================================================
@@ -2888,58 +3150,46 @@ use Soap\Url as SoapUrl;
 
 namespace Controllers;
 
-use Core\Database\DBConnection;
-use Core\Helper\Alert;
-use Core\Helper\URL;
-use Repositories\UserRepository;
-use Services\SessionsServices;
+use Services\APIServices;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
-use Views\Layouts\Navbar;
 
 class DashboardController {
+    private APIServices $api;
+
+    public function __construct() {
+        $this->api = new APIServices();
+    }
+
     public function index() {
-        $session = new SessionsServices();
-        
-        $sessionStatus = $session->has('username');
-        if(!$sessionStatus) URL::redirect('login');
-        
-        $head = new Head('Dashboard', 'dashboard');
-        echo $head->Render();
-
-
+        echo (new Head('Dashboard', 'dashboard'))->Render();
         include BASE_PATH . '/Views/Pages/Dashboard.php';
-
         echo (new Footer('script', 'chart.umd.min'))->Render();
-
-        if ($session->has('username')) {
-            
-        } else {
-            echo "No session found, please login.";
-        }
     }
 
-    public function getUsersWithDates() {
-
-        include BASE_PATH . "/APIs/getUsersWithDates.php";
-
+    private function jsonResponse($data): void {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
-    public function getCats() {
-
-        include BASE_PATH . '/APIs/getItemsCountWithCats.php';
-
+    public function getUsersWithDates(): void {
+        $this->jsonResponse($this->api->getUsersWithDates());
     }
 
-    public function getCountryMade() {
-
-        include BASE_PATH . '/APIs/getCountryMadeAPI.php';
-
+    public function getCats(): void {
+        $this->jsonResponse($this->api->getItemsCountWithCats());
     }
 
+    public function getCountryMade(): void {
+        $this->jsonResponse($this->api->getCountryMade());
+    }
 
+    public function searchBox(): void {
+        $q = $_GET['q'] ?? '';
+        $this->jsonResponse($this->api->searchData($q));
+    }
 }
-?>
+
 
 
 ==================================================
@@ -3002,12 +3252,12 @@ use Stringable;
 
             );
         }
-        public function isExist(string $name) : bool {
+        public function isExist(string $name, ?int $id = null) : bool {
 
-            $SQL = "SELECT COUNT(*) FROM categories WHERE Name = ? ";
+            $SQL = "SELECT COUNT(*) FROM categories WHERE `Name` = ? AND `ID` != ? ";
 
             $stmt = $this->PDO->prepare($SQL);
-            $stmt->execute([$name]);
+            $stmt->execute([$name, $id]);
 
             return (int) $stmt->fetchColumn() > 0;
 
@@ -3132,8 +3382,7 @@ class ItemRepository
 
         return $stmt->execute();
     } catch (PDOException $e) {
-        Alert::Print($e->getMessage());
-        return false;
+        return $e->getMessage();
     }
 }
 
@@ -3426,7 +3675,7 @@ use Model\User;
         $stmt = $this->PDO->prepare($SQL);
         $stmt->execute([$id]);
 
-        return $stmt->columnCount() > 0;
+        return $stmt->rowCount() > 0;
 
     }
 

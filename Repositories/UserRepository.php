@@ -153,7 +153,7 @@ use Model\User;
         $stmt = $this->PDO->prepare($SQL);
         $stmt->execute([$id]);
 
-        return $stmt->columnCount() > 0;
+        return $stmt->rowCount() > 0;
 
     }
 
