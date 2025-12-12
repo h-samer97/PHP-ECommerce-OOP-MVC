@@ -45,9 +45,11 @@ class AppUI {
         this.confirmDelete();
         this.showLoaderOnLoad();
         // this.toggleSideBarStatus();
-        this.api.renderCatsAPI();
+        // this.api.renderCatsAPI();
         this.api.renderUsersDatesChart();
         this.api.searchBox();
+        this.api.monthlyRegistrationCount();
+        // this.api.renderUsersDatesChart;
     }
 
     toggleNavMenu() {

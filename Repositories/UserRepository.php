@@ -205,4 +205,26 @@ use Model\User;
         return $stmt->rowCount() ?? 0;
     }
 
+    public function monthlyRegistrationCount() : mixed {
+        $SQL = "SELECT 
+                    MONTH(Date_Reg) AS month,
+                    COUNT(*) AS registrations
+                    FROM 
+                    users
+                    WHERE 
+                    YEAR(Date_Reg) = ?
+                    GROUP BY 
+                    MONTH(Date_Reg)
+                    ORDER BY 
+                    MONTH(Date_Reg);
+                    ";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([2025]);
+
+        return $stmt->fetchAll();
+    }
+
+
+
 }

@@ -103,6 +103,13 @@ $router->add('api/getCountryMade', function() {
 
 });
 
+$router->add('api/monthlyRegistrationCount', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->monthlyRegistrationCount();
+
+});
+
 $router->add('api/searchData', function() {
 
     $dashboard = new DashboardController();

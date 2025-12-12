@@ -15,7 +15,7 @@ class DashboardController {
 
     public function index() {
         echo (new Head('Dashboard', 'dashboard'))->Render();
-        include BASE_PATH . '/Views/Pages/Dashboard.php';
+        include BASE_PATH . '/Views/Pages/Main/Dashboard.php';
         echo (new Footer('script', 'chart.umd.min'))->Render();
     }
 
@@ -30,6 +30,10 @@ class DashboardController {
 
     public function getCats(): void {
         $this->jsonResponse($this->api->getItemsCountWithCats());
+    }
+
+    public function monthlyRegistrationCount() : void {
+        $this->jsonResponse($this->api->monthlyRegistrationCount());
     }
 
     public function getCountryMade(): void {

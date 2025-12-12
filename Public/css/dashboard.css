@@ -1,11 +1,9 @@
-
 /* === Dashboard Container === */
 .dashboard-container {
   width: 100%;
   max-width: 100%;
   background-color: #111;
   display: flex;
-  /* flex-direction: column; */
 }
 
 /* === Dashboard Stats Section === */
@@ -16,6 +14,7 @@
   flex-basis: 68%;
   margin: 10px;
 }
+
 .d-bar {
   width: 100%;
   display: flex;
@@ -32,11 +31,6 @@
   flex-basis: 70%;
 }
 
-/* .d-bar button {} */
-/* .d-bar i {
-  background-color: #44445F;
-} */
-
 .d-hello {
   background-color: var(--main-dark-blue);
   color: var(--main-lighter-blue);
@@ -50,27 +44,19 @@
   padding: 20px;
   margin: 6px;
 }
-.d-hello h3 {
-  color: white;
-  margin: 10px;
-}
+.d-hello h3,
 .d-hello p {
   color: white;
   margin: 10px;
 }
-
 
 .d-stats-info {
   display: flex;
   background-color: var(--main-darker-blue);
   gap: 10px;
 }
-.d-pie {
-  flex: 1;
-}
-.d-line {
-  flex: 1;
-}
+.d-pie { flex: 1; }
+.d-line { flex: 1; }
 
 /* === Dashboard Info Section === */
 .dashboard-info {
@@ -89,9 +75,7 @@
   box-shadow: 1px 26px 34px -11px rgba(0,0,0,0.57);
 }
 
-.d-profile {
-  color: white;
-}
+.d-profile { color: white; }
 .d-profile-name {
   display: flex;
   justify-content: center;
@@ -103,25 +87,18 @@
   width: 90px;
   border-radius: 50%;
   margin: 10px 0;
-  padding: 0;
 }
 .d-txt {
   display: flex;
   flex-direction: column;
   margin: 10px 0;
 }
-.d-txt h4 {
-  margin: 10px 0;
-}
+.d-txt h4 { margin: 10px 0; }
 .d-txt span {
   margin: 10px 5px;
   color: var(--main-color-light-sec);
 }
-.d-addr i {
-  color: var(--main-lighter-blue);
-}
-/* .d-addr span {} */
-
+.d-addr i { color: var(--main-lighter-blue); }
 
 .d-profile-box {
   display: flex;
@@ -134,8 +111,6 @@
   text-align: center;
   padding-right: 15px;
 }
-/* .d-profile-box span {}
-.d-profile-box p {} */
 
 /* === Commends Section === */
 .d-commends {
@@ -150,9 +125,8 @@
   margin: 20px 10px;
   text-align: center;
 }
-.d-c-list span {
-  margin: 10px 0;
-}
+.d-c-list span { margin: 10px 0; }
+
 /* === Charts Section === */
 .charts-row {
   display: grid;
@@ -171,19 +145,19 @@
   align-items: center;
   justify-content: center;
 }
-
 .chart-box h4 {
   color: #fff;
   margin-bottom: 15px;
   font-size: 18px;
   text-align: center;
 }
-
 .chart-box canvas {
   width: 100% !important;
   max-width: 100%;
   height: 300px !important;
 }
+
+/* === Search Box Results === */
 .sb-resultes {
   width: 600px;
   position: absolute;
@@ -191,7 +165,6 @@
   top: 125px;
   left: 22px;
   z-index: 4;
-  height: auto;
   max-height: 400px;
   color: white;
   display: flex;
@@ -199,8 +172,8 @@
   border-radius: 8px;
 }
 .sb-resultes div {
-    padding: 10px 5px;
-    cursor: pointer;
+  padding: 10px 5px;
+  cursor: pointer;
   border-radius: 8px;
 }
 .sb-resultes div:hover {

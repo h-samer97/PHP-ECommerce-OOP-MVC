@@ -32,13 +32,17 @@ function e($string) {
 
             <!-- Charts -->
             <div class="charts-row">
+
                 <div class="chart-box">
-                    <h4>إحصائية تسجيل المستخدمين حسب السنة</h4>
                     <canvas id="charts"></canvas>
                 </div>
-                <div class="chart-box">
-                    <h4>عدد العناصر حسب الفئة</h4>
+
+                 <div class="chart-box">
                     <canvas id="categoryChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
 

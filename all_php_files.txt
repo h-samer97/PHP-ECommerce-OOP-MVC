@@ -51,13 +51,17 @@ function e($string) {
 
             <!-- Charts -->
             <div class="charts-row">
+
                 <div class="chart-box">
-                    <h4>إحصائية تسجيل المستخدمين حسب السنة</h4>
                     <canvas id="charts"></canvas>
                 </div>
-                <div class="chart-box">
-                    <h4>عدد العناصر حسب الفئة</h4>
+
+                 <div class="chart-box">
                     <canvas id="categoryChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
 
@@ -149,6 +153,8 @@ function e($string) {
 <?php
 
 use Core\Helper\Alert;
+use Dom\Comment;
+use Repositories\CommentRepository;
 use Services\CSRFToken;
 use Views\Layouts\Head;
 
@@ -177,11 +183,9 @@ echo (new Head('', ''))->Render();
 
 // if (isset($data['meta'])) {
 //     echo "<p>Last updated: " . htmlspecialchars($data['meta']['last_updated_at']) . "</p>";
-
-  echo $_SERVER['REQUEST_URI'];
-
-  $uri = parse_url($server['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-
+$X=new CommentRepository();
+$y = $X->findByItemId(3);
+print_r($y->comments);
 ?>
 
 
@@ -1239,6 +1243,13 @@ $router->add('api/getCountryMade', function() {
 
 });
 
+$router->add('api/monthlyRegistrationCount', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->monthlyRegistrationCount();
+
+});
+
 $router->add('api/searchData', function() {
 
     $dashboard = new DashboardController();
@@ -2096,6 +2107,87 @@ abstract class AbstractSessions implements ISessions {
 
 
 ==================================================
+=== FILE: ./Model/Comment.php
+==================================================
+<?php
+
+namespace Model;
+
+class Comment {
+    public int $c_id;
+    public string $comments;
+    public int $status_com;
+    public string $Added_date;
+    public int $item_id;
+    public int $user_id;
+
+    public function __construct(
+        int $c_id,
+        string $comments,
+        int $status_com,
+        string $Added_date,
+        int $item_id,
+        int $user_id
+    ) {
+        $this->c_id        = $c_id;
+        $this->comments    = $comments;
+        $this->status_com  = $status_com;
+        $this->Added_date  = $Added_date;
+        $this->item_id     = $item_id;
+        $this->user_id     = $user_id;
+    }
+
+    public function getContent(): string {
+        return $this->comments;
+    }
+
+    public function isApproved(): bool {
+        return $this->status_com === 1;
+    }
+
+    public function getAuthorId(): int {
+        return $this->user_id;
+    }
+
+    public function getItemId(): int {
+        return $this->item_id;
+    }
+}
+
+
+
+==================================================
+=== FILE: ./Model/Tag.php
+==================================================
+<?php
+
+namespace Model;
+
+class Tag
+{
+    private int $item_id;
+    private int $tag_id;
+
+    public function __construct(int $item_id, int $tag_id)
+    {
+        $this->item_id = $item_id;
+        $this->tag_id = $tag_id;
+    }
+
+    public function getItemId(): int
+    {
+        return $this->item_id;
+    }
+
+    public function getTagId(): int
+    {
+        return $this->tag_id;
+    }
+}
+
+
+
+==================================================
 === FILE: ./Model/Category.php
 ==================================================
 <?php 
@@ -2402,11 +2494,15 @@ class APIServices {
     }
 
     public function getItemsCountWithCats(): array {
-        return $this->itemRepo->getItemFromCategories();
+        return $this->itemRepo->getItemsCountWithCats();
     }
 
     public function getCountryMade(): array {
         return $this->itemRepo->getCountryMadeAPI();
+    }
+
+    public function monthlyRegistrationCount(): array {
+        return $this->userRepo->monthlyRegistrationCount();
     }
 
     public function searchData(): array {
@@ -3163,7 +3259,7 @@ class DashboardController {
 
     public function index() {
         echo (new Head('Dashboard', 'dashboard'))->Render();
-        include BASE_PATH . '/Views/Pages/Dashboard.php';
+        include BASE_PATH . '/Views/Pages/Main/Dashboard.php';
         echo (new Footer('script', 'chart.umd.min'))->Render();
     }
 
@@ -3180,6 +3276,10 @@ class DashboardController {
         $this->jsonResponse($this->api->getItemsCountWithCats());
     }
 
+    public function monthlyRegistrationCount() : void {
+        $this->jsonResponse($this->api->monthlyRegistrationCount());
+    }
+
     public function getCountryMade(): void {
         $this->jsonResponse($this->api->getCountryMade());
     }
@@ -3187,6 +3287,99 @@ class DashboardController {
     public function searchBox(): void {
         $q = $_GET['q'] ?? '';
         $this->jsonResponse($this->api->searchData($q));
+    }
+}
+
+
+
+==================================================
+=== FILE: ./Repositories/TagRepository.php
+==================================================
+<?php
+
+namespace Repositories;
+
+use Model\Tag;
+use Model\ItemTag;
+use PDO;
+
+class TagRepository
+{
+    private PDO $connection;
+
+    public function __construct(PDO $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    // جلب كل الوسوم
+    public function getAllTags(): array
+    {
+        $stmt = $this->connection->query("SELECT tag_id, tag_name FROM tags");
+        $tags = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $tags[] = new Tag((int)$row['tag_id'], $row['tag_name']);
+        }
+        return $tags;
+    }
+
+    // جلب وسوم عنصر معيّن
+    public function getTagsByItemId(int $itemId): array
+    {
+        $stmt = $this->connection->prepare("
+            SELECT t.tag_id, t.tag_name
+            FROM tags t
+            INNER JOIN item_tags it ON t.tag_id = it.tag_id
+            WHERE it.item_id = :itemId
+        ");
+        $stmt->execute(['itemId' => $itemId]);
+
+        $tags = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $tags[] = new Tag((int)$row['tag_id'], $row['tag_name']);
+        }
+        return $tags;
+    }
+
+    // جلب العناصر المرتبطة بوسم معيّن
+    public function getItemsByTag(string $tagName): array
+    {
+        $stmt = $this->connection->prepare("
+            SELECT i.Item_id, i.Item_name
+            FROM items i
+            INNER JOIN item_tags it ON i.Item_id = it.item_id
+            INNER JOIN tags t ON it.tag_id = t.tag_id
+            WHERE t.tag_name = :tagName
+        ");
+        $stmt->execute(['tagName' => $tagName]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // إضافة وسم جديد
+    public function addTag(string $tagName): int
+    {
+        $stmt = $this->connection->prepare("INSERT INTO tags (tag_name) VALUES (:tagName)");
+        $stmt->execute(['tagName' => $tagName]);
+        return (int)$this->connection->lastInsertId();
+    }
+
+    // ربط عنصر بوسم
+    public function addTagToItem(int $itemId, int $tagId): void
+    {
+        $stmt = $this->connection->prepare("
+            INSERT INTO item_tags (item_id, tag_id) VALUES (:itemId, :tagId)
+        ");
+        $stmt->execute(['itemId' => $itemId, 'tagId' => $tagId]);
+    }
+
+    // حذف وسم من عنصر
+    public function removeTagFromItem(int $itemId, int $tagId): void
+    {
+        $stmt = $this->connection->prepare("
+            DELETE FROM item_tags WHERE item_id = :itemId AND tag_id = :tagId
+        ");
+        $stmt->execute(['itemId' => $itemId, 'tagId' => $tagId]);
     }
 }
 
@@ -3419,18 +3612,26 @@ class ItemRepository
     }
 
 
-    public function getItemFromCategories() {
+  public function getItemsCountWithCats() {
+    $SQL = "
+        SELECT 
+            categories.Name AS Name,
+            COUNT(items.Item_id) AS ItemCount
+        FROM categories
+        LEFT JOIN items ON items.Cat_ID = categories.ID
+        GROUP BY categories.ID
+        ORDER BY ItemCount DESC
+    ";
 
-        $SQL = "SELECT items.Item_name AS Name, categories.Name AS `Cat Name`, items.Cat_ID AS ICI, categories.ID AS CID FROM items
-                INNER JOIN categories ON categories.ID = items.Cat_ID";
+    $stmt = $this->pdo->prepare($SQL);
+    $stmt->execute();
 
-        $stmt = $this->pdo->prepare($SQL);
-        $stmt->execute([]);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? null;
+    // Always return an array, never null
+    return $result ?: [];
+}
 
-
-    }
 
                     public function update(
                     int $id,
@@ -3727,7 +3928,89 @@ use Model\User;
         return $stmt->rowCount() ?? 0;
     }
 
+    public function monthlyRegistrationCount() : mixed {
+        $SQL = "SELECT 
+                    MONTH(Date_Reg) AS month,
+                    COUNT(*) AS registrations
+                    FROM 
+                    users
+                    WHERE 
+                    YEAR(Date_Reg) = ?
+                    GROUP BY 
+                    MONTH(Date_Reg)
+                    ORDER BY 
+                    MONTH(Date_Reg);
+                    ";
+
+        $stmt = $this->PDO->prepare($SQL);
+        $stmt->execute([2025]);
+
+        return $stmt->fetchAll();
+    }
+
+
+
 }
 
+
+
+==================================================
+=== FILE: ./Repositories/CommentRepository.php
+==================================================
+<?php
+
+    namespace Repositories;
+
+use Core\Database\DBConnection;
+use Model\Comment;
+use PDO;
+
+    class CommentRepository {
+
+        private PDO $pdo;
+
+        public function __construct()
+        {
+            $this->pdo = ( new DBConnection() )->getConnection();
+        }
+
+        public function findByItemId($id) : ?Comment {
+
+            $SQL = "
+                SELECT 
+                    items.Item_id AS itemId,
+                    items.Item_name,
+                    comments.c_id AS commentId,
+                    comments.comments,
+                    comments.status_com,
+                    comments.Added_date,
+                    comments.user_id
+                    FROM items
+                    INNER JOIN comments 
+                    ON items.Item_id = comments.item_id
+                WHERE comments.c_id = ?
+            ";
+
+            $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([$id]);
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if(empty($data)) return null;
+
+            return new Comment(
+                (int)$data['commentId'],
+                (string)$data['comments'],
+                (int)$data['status_com'],
+                (string)$data['Added_date'],
+                (int)$data['itemId'],
+                (int)$data['user_id']
+                
+            );
+
+        }
+
+    }
+
+?>
 
 

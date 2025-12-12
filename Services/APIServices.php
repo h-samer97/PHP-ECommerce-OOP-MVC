@@ -23,11 +23,15 @@ class APIServices {
     }
 
     public function getItemsCountWithCats(): array {
-        return $this->itemRepo->getItemFromCategories();
+        return $this->itemRepo->getItemsCountWithCats();
     }
 
     public function getCountryMade(): array {
         return $this->itemRepo->getCountryMadeAPI();
+    }
+
+    public function monthlyRegistrationCount(): array {
+        return $this->userRepo->monthlyRegistrationCount();
     }
 
     public function searchData(): array {

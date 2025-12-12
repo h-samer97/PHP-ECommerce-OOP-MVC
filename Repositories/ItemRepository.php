@@ -79,18 +79,26 @@ class ItemRepository
     }
 
 
-    public function getItemFromCategories() {
+  public function getItemsCountWithCats() {
+    $SQL = "
+        SELECT 
+            categories.Name AS Name,
+            COUNT(items.Item_id) AS ItemCount
+        FROM categories
+        LEFT JOIN items ON items.Cat_ID = categories.ID
+        GROUP BY categories.ID
+        ORDER BY ItemCount DESC
+    ";
 
-        $SQL = "SELECT items.Item_name AS Name, categories.Name AS `Cat Name`, items.Cat_ID AS ICI, categories.ID AS CID FROM items
-                INNER JOIN categories ON categories.ID = items.Cat_ID";
+    $stmt = $this->pdo->prepare($SQL);
+    $stmt->execute();
 
-        $stmt = $this->pdo->prepare($SQL);
-        $stmt->execute([]);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? null;
+    // Always return an array, never null
+    return $result ?: [];
+}
 
-
-    }
 
                     public function update(
                     int $id,
