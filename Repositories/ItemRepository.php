@@ -166,6 +166,15 @@ class ItemRepository
 
         }
 
+        public function getItemsByCategoryId(int $catId): array {
+
+            $SQL = "SELECT * FROM items WHERE Cat_ID = ? ORDER BY Item_id DESC";
+            $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([$catId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+            
+}
+
         public function getCountryMadeAPI() : ?array {
 
             $SQL = "SELECT Country_Made, COUNT(*) AS ItemCount
@@ -178,6 +187,32 @@ class ItemRepository
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
 
+        }
+
+        public function analiysRating() : ?array {
+
+            $SQL = 'SELECT Rating, COUNT(*) AS total
+                    FROM items
+                    GROUP BY Rating
+                    ORDER BY Rating;
+                    ';
+
+             $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
+
+        public function analiysApprovedItems() {
+            $SQL = 'SELECT Approve, COUNT(*) AS total
+                    FROM items
+                    GROUP BY Approve;
+                    ';
+            $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
         }
 
 

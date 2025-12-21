@@ -24,7 +24,6 @@ use Core\Database\DBConnection;
 use Repositories\UserRepository;
 use Core\Helper\URL;
 
-// دالة مساعدة مختصرة للترميز الآمن
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
@@ -39,8 +38,8 @@ function e($string) {
             <div class="d-bar">
                 <input type="text" id="searchBox" placeholder="Search Here...">
                 <div class="sb-resultes"></div>
-                <button>
-                    <i class="fas fa-solid fa-bell"></i>
+                <button id="notifications">
+                    <i class="fas fa-solid fa-bell" id="btn-notifications"></i>
                 </button>
             </div>
 
@@ -57,7 +56,7 @@ function e($string) {
                 </div>
 
                  <div class="chart-box">
-                    <canvas id="categoryChart"></canvas>
+                    <canvas id="analiysRating"></canvas>
                 </div>
 
                 <div class="chart-box">
@@ -67,13 +66,12 @@ function e($string) {
 
             <div class="d-stats-info">
                 <div class="d-pie">
-                    <?php
-                        $repo = new UserRepository((new DBConnection())->getConnection());
-                        echo e($repo->sumCountAllUsers());
-                    ?>
+                   <canvas id="d-pie">
+                   </canvas>
                 </div>
                 <div class="d-line">
-                    charts
+                    <canvas id="d-line">
+                   </canvas>
                 </div>
             </div>
         </div>
@@ -82,44 +80,65 @@ function e($string) {
             <h3>My Profile</h3>
             <div class="d-profile">
                 <div class="d-profile-name">
-                    <img src="<?php echo e(URL::ico('editmembers')); ?>" alt="">
+                    <img src="" id="avatar">
                     <div class="d-txt">
-                        <h4><?php echo e($user->name ?? 'Guest'); ?></h4>
-                        <span><?php echo e($user->bio ?? 'No bio available'); ?></span>
-                        <div class="d-addr">
-                            <i class="fa fa-map-marker"></i> 
-                            <span><?php echo e($user->address ?? 'Unknown'); ?></span>
+                        Full Name: <h4 id="fullname"></h4>
+                        Username: <span id="username"></span>
+                        <div class="d-addr" id="address">
+                            <i class="fa fa-email"></i> 
+                            Email: <span id="email"></span>
                         </div>
                     </div>
                 </div>
                 <div class="d-profile-box">
                     <div>
-                        <span>lorem</span>
-                        <p><?php echo e($user->posts ?? 0); ?></p>
+                        <span>Regestar Date</span>
+                        <p id="dateReg"></p>
                     </div>
                     <div>
-                        <span>lorem</span>
-                        <p><?php echo e($user->comments ?? 0); ?></p>
-                    </div>
-                    <div>
-                        <span>lorem</span>
-                        <p><?php echo e($user->followers ?? 0); ?></p>
+                        <span>Items Total</span>
+                        <p id="itemsCount"></p>
                     </div>
                 </div>
             </div>
 
             <div class="d-commends">
                 <h3>Last 10 Commends</h3>
-                <div class="d-c-list">
-                    <?php foreach($comments as $comment): ?>
-                        <span><?php echo e($comment['text']); ?></span>
-                    <?php endforeach; ?>
-                </div>
+
+                <?php 
+                if (!empty($comments) && is_array($comments)) {
+                    foreach ($comments as $comment) {
+                        ?>
+                        <div class="d-c-list">
+
+                           <div class="d-c-img">
+                                <img src="<?php echo e($comment['avatar'] ?? URL::ico('user')); ?>" alt="">
+                           </div>
+
+                           <div class="d-c-comment">
+
+                            <div class="d-c-c-head">
+                                <h3><?php echo e($comment['Username'] ?? ''); ?></h3>
+                                <span class="d-c-date"><?php echo e($comment['Added_date'] ?? ''); ?></span>
+                            </div>
+
+                            <p class="d-c-cc">
+                                <?php echo e($comment['comments'] ?? ''); ?>
+                            </p>
+
+                           </div>
+                        </div>
+                        <?php
+                    }
+                } else {
+                    echo '<p>No comments found.</p>';
+                }
+                ?>
+
             </div>
         </div>
     </section>
 </main>
-
 
 
 ==================================================
@@ -187,6 +206,117 @@ $X=new CommentRepository();
 $y = $X->findByItemId(3);
 print_r($y->comments);
 ?>
+
+
+
+==================================================
+=== FILE: ./Views/Pages/Comments/EditComment.php
+==================================================
+<?php
+
+use Core\Helper\FlashMessage;
+use Views\Layouts\Head;
+use Views\Layouts\Footer;
+
+echo (new Head('Edit Comment', 'comments'))->Render();
+FlashMessage::init();
+FlashMessage::display();
+?>
+
+<link rel="stylesheet" href="/css/comment-view.css">
+
+<div class="edit-comment-page">
+    <div class="container">
+        <div class="back-nav">
+            <a href="/comments/<?php echo $comment->c_id; ?>/view"><i class="fas fa-arrow-left"></i> Back to Comment</a>
+        </div>
+
+        <div class="comment-card">
+            <div class="card-header">
+                <h2><i class="fas fa-pen"></i> Edit Comment</h2>
+            </div>
+
+            <div class="card-body">
+                <form method="POST" action="comments/<?php echo $comment->c_id; ?>/update">
+                    <div class="form-group">
+                        <label for="comments">Comment Content</label>
+                        <textarea id="comments" name="comment" class="pro-form-control" rows="6"><?php echo htmlspecialchars($comment->comments); ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status_com">Status</label>
+                        <select id="status_com" name="status" class="pro-form-control">
+                            <option value="1" <?php if ($comment->status_com == 1) echo 'selected'; ?>>Published</option>
+                            <option value="0" <?php if ($comment->status_com == 0) echo 'selected'; ?>>Pending</option>
+                        </select>
+                    </div>
+
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-edit"><i class="fas fa-save"></i> Save Changes</button>
+                        <a href="/comments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php echo (new Footer('script', ''))->Render(); ?>
+
+
+
+==================================================
+=== FILE: ./Views/Pages/Comments/Comments.php
+==================================================
+<?php
+use Views\Layouts\Head;
+use Views\Layouts\Footer;
+use Core\Helper\FlashMessage;
+
+echo (new Head('Comments Management', 'comments'))->Render();
+
+FlashMessage::init();
+FlashMessage::display();
+
+?>
+
+<div class="comments-container-wrapper">
+    <?php foreach ($comments as $comment): ?>
+        <div class="pro-card">
+            <div class="pro-card-header">
+                <h2><i class="fas fa-eye"></i> Comment Details</h2>
+                <span class="pro-badge badge-active">ID #<?php echo $comment->CommentItemID; ?></span>
+            </div>
+            
+            <div class="pro-card-body">
+                <div class="info-grid">
+                    <div class="detail-item">
+                        <span class="label"><i class="fas fa-user"></i> Author</span>
+                        <span class="value"><?php echo htmlspecialchars($comment->UserName); ?></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label"><i class="fas fa-calendar"></i> Date</span>
+                        <span class="value"><?php echo $comment->CommentDate; ?></span>
+                    </div>
+                </div>
+
+                <div class="content-area">
+                    <span class="label">Comment Content</span>
+                    <div class="comment-display-box">
+                        <?php echo nl2br(htmlspecialchars($comment->CommentText)); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pro-card-footer">
+                <a href="/comments/<?php echo $comment->CommentID; ?>/edit" class="pro-btn pro-btn-primary">Edit</a>
+                <a href="/comments" class="pro-btn pro-btn-secondary">Back</a>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
+
+<?php echo (new Footer('script', ''))->Render(); ?>
 
 
 
@@ -539,6 +669,46 @@ echo (new Footer('script', 'chart.umd.min'))->Render();
 
 
 ==================================================
+=== FILE: ./Views/Pages/Items/ItemsByCategory.php
+==================================================
+<?php
+use Views\Layouts\Head;
+use Views\Layouts\Footer;
+
+echo (new Head('عرض العناصر', 'categories'))->Render();
+?>
+<link rel="stylesheet" href="/css/category-items.css">
+
+<div class="category-items-container">
+    <div class="category-header">
+        <h2>عناصر الفئة: <?php echo htmlspecialchars($categoryName); ?></h2>
+    </div>
+
+    <div class="items-grid">
+        <?php foreach ($items as $item): ?>
+            <div class="item-card">
+                <div class="item-img">
+                    <img src="/uploads/<?php echo $item['Image'] ?: 'default.png'; ?>" alt="">
+                    <span class="item-price"><?php echo $item['Price']; ?>$</span>
+                </div>
+                <div class="item-content">
+                    <h3><?php echo htmlspecialchars($item['Item_name']); ?></h3>
+                    <div class="item-actions">
+                        <span><?php echo $item['Add_Date']; ?></span>
+                        <a href="/items/<?php echo $item['Item_id']; ?>/edit" class="btn-edit-link">
+                             تعديل <i class="fa fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<?php echo (new Footer('script', ''))->Render(); ?>
+
+
+==================================================
 === FILE: ./Views/Pages/Items/AddItem.php
 ==================================================
 <?php
@@ -623,35 +793,38 @@ FlashMessage::display();
 
 <main class="all-categories">
 
-    <?php 
-        foreach($rows as $row) {
-            echo '<div class="cat-section">';
-            echo '<h4>' . e($row['Name']) . '</h4>';
-            echo '<a href="categories/' . e($row['ID']) . '/edit">edit</a> 
-                  <a href="categories/' . e($row['ID']) . '/delete">delete</a>';
-            
-            echo '<div class="cat">';
-            
-            foreach($items as $item) {
-                if($row['ID'] == $item['ICI']) {
-                    echo '<div>' . e($item['Name']) . '</div>';
-                }
-            }
+    <?php foreach($rows as $row): ?>
+        <section class="cat-section">
+            <header class="cat-header">
+                <h4><?= e($row['Name']) ?></h4>
+                <nav class="cat-actions">
+                    <a href="categories/<?= e($row['ID']) ?>/edit" class="btn-edit">Edit</a>
+                    <a href="categories/<?= e($row['ID']) ?>/delete" class="btn-delete">Delete</a>
+                </nav>
+            </header>
 
-            echo '<p>' . e($row['Description']) . '</p>';
-            
-            echo '<div class="cat-config">';
-                echo e($row['Order']);
-                echo e($row['Visibility']);
-                echo e($row['Allow_Comment']);
-                echo e($row['Allow_Ads']);
-            echo '</div>';
+            <div class="cat-items">
+                <?php foreach($items as $item): ?>
+                    <?php if($row['ID'] == $item['ICI']): ?>
+                        <div class="cat-item"><?= e($item['Name']) ?></div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
 
-            echo '<a href="" class="cat-view">View</a>';
-            echo '</div>';
-        }      
-    ?>
-    </div>
+            <p class="cat-description"><?= e($row['Description']) ?></p>
+
+            <ul class="cat-config">
+                <li>Order: <?= e($row['Order']) ?></li>
+                <li>Visibility: <?= e($row['Visibility']) ?></li>
+                <li>Comments: <?= e($row['Allow_Comment']) ?></li>
+                <li>Ads: <?= e($row['Allow_Ads']) ?></li>
+            </ul>
+
+            <footer class="cat-footer">
+                <a href="categories/<?= e($row['ID']) ?>" class="cat-view">View</a>
+            </footer>
+        </section>
+    <?php endforeach; ?>
 
 </main>
 
@@ -659,6 +832,64 @@ FlashMessage::display();
 echo ( new Footer('script', '') )->Render();
 ?>
 
+
+
+==================================================
+=== FILE: ./Views/Pages/Categories/CategoryItems.php
+==================================================
+<?php
+use Views\Layouts\Head;
+use Views\Layouts\Footer;
+
+// دالة الحماية
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+}
+
+echo (new Head('Category Items', 'categories'))->Render();
+?>
+
+<div class="container main-content">
+    <div class="page-header">
+        <h1>Items in: <span><?php echo isset($category) ? e($category->Name) : 'Unknown'; ?></span></h1>
+        <a href="<?php echo BASE_URL . 'items/insert'; ?>" class="btn-add">Add New Item <i class="fas fa-plus"></i></a>
+    </div>
+
+    <?php if (empty($items)): ?>
+        <div class="alert alert-info">No items found in this category.</div>
+    <?php else: ?>
+        <div class="items-grid">
+            <?php foreach ($items as $item): ?>
+                <div class="item-card">
+                    <div class="item-img">
+                        <?php if(!empty($item['Image'])): ?>
+                             <img src="<?php echo BASE_URL . 'uploads/' . e($item['Image']); ?>" alt="Item Image">
+                        <?php else: ?>
+                             <div class="no-img">No Image</div>
+                        <?php endif; ?>
+                        <span class="price-tag">$<?php echo e($item['Price']); ?></span>
+                    </div>
+                    <div class="item-body">
+                        <h3><?php echo e($item['Item_name']); ?></h3>
+                        <p><?php echo substr(e($item['Item_description']), 0, 50) . '...'; ?></p>
+                        <div class="item-meta">
+                            <span class="date"><i class="far fa-clock"></i> <?php echo date('M d, Y', strtotime($item['Add_Date'])); ?></span>
+                            <a href="<?php echo BASE_URL . 'items/' . e($item['Item_id']) . '/edit'; ?>" class="btn-edit-item">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
+
+<style>
+    
+</style>
+
+<?php echo (new Footer('script', 'chart.umd.min'))->Render(); ?>
 
 
 ==================================================
@@ -1148,6 +1379,7 @@ require_once __DIR__ . '/../Core/Router/Router.php';
 
 use Controllers\AuthController;
 use Controllers\CategoriesController;
+use Controllers\CommentController;
 use Controllers\DashboardController;
 use Controllers\ItemController;
 use Controllers\MembersController;
@@ -1205,6 +1437,23 @@ $router->add('members/{id}/delete', function($id) {
     $members->delete((int)$id);
 });
 
+// مسار لعرض العناصر داخل فئة محددة
+$router->add('categories/{id}/items', function($id) {
+    $categories = new CategoriesController();
+    $categories->showItems($id);
+});
+
+// مسارات تعديل التعليقات
+$router->add('comments/{id}/edit', function($id) {
+    $comments = new CommentController();
+    $comments->edit($id);
+});
+
+$router->add('comments/{id}/update', function($id) {
+    $comments = new CommentController();
+    $comments->update($id);
+});
+
 $router->add('members/pending', function() {
     $members = new MembersController();
     $members->getPendingUsers();
@@ -1236,10 +1485,46 @@ $router->add('api/getCats', function() {
 
 });
 
+$router->add('api/analiysRating', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->analiysRating();
+
+});
+
+$router->add('api/analiysApprovedItems', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->analiysApprovedItems();
+
+});
+
+
 $router->add('api/getCountryMade', function() {
 
     $dashboard = new DashboardController();
     $dashboard->getCountryMade();
+
+});
+
+$router->add('api/getTotalItemsInCats', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getTotalItemsInCats();
+
+});
+
+$router->add('api/getInformationToDashboard', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getInformationToDashboard();
+
+});
+
+$router->add('api/getNotifs', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->fetchNotifs();
 
 });
 
@@ -1291,6 +1576,11 @@ $router->add('categories/{id}/delete', function($id) {
 $router->add('items/insert', function() {
     $item = new ItemController();
     $item->insert();
+});
+
+$router->add('comments', function() {
+    $comments = new CommentController();
+    $comments->index();
 });
 
 $router->add('items/{id}/edit', function($id) {
@@ -2115,26 +2405,32 @@ namespace Model;
 
 class Comment {
     public int $c_id;
+    public string $Item_name;
     public string $comments;
     public int $status_com;
     public string $Added_date;
     public int $item_id;
     public int $user_id;
+    public ?string $username = null;
 
     public function __construct(
         int $c_id,
+        string $Item_name,
         string $comments,
         int $status_com,
         string $Added_date,
         int $item_id,
-        int $user_id
+        int $user_id,
+        string $username
     ) {
         $this->c_id        = $c_id;
+        $this->Item_name   = $Item_name;
         $this->comments    = $comments;
         $this->status_com  = $status_com;
         $this->Added_date  = $Added_date;
         $this->item_id     = $item_id;
         $this->user_id     = $user_id;
+        $this->username    = $username;
     }
 
     public function getContent(): string {
@@ -2477,16 +2773,19 @@ use Core\Database\DBConnection;
 use Repositories\CategoryRepository;
 use Repositories\ItemRepository;
 use PDO;
+use Repositories\APIRepository;
 
 class APIServices {
     private UserRepository $userRepo;
     private ItemRepository $itemRepo;
     private CategoryRepository $categoryRepo;
+    private APIRepository $API;
 
     public function __construct() {
         $this->userRepo = new UserRepository((new DBConnection())->getConnection());
         $this->itemRepo = new ItemRepository((new DBConnection())->getConnection());
         $this->categoryRepo = new CategoryRepository((new DBConnection())->getConnection());
+        $this->API = new APIRepository();
     }
 
     public function getUsersWithDates(): array {
@@ -2501,8 +2800,30 @@ class APIServices {
         return $this->itemRepo->getCountryMadeAPI();
     }
 
+    public function analiysRating() : array {
+        return $this->itemRepo->analiysRating();
+    }
+
+     public function analiysApprovedItems() : array {
+        return $this->itemRepo->analiysApprovedItems();
+    }
+
+    public function getTotalItemsInCats() : array {
+        return $this->categoryRepo->getTotalItemsInCats();
+    }
+
     public function monthlyRegistrationCount(): array {
         return $this->userRepo->monthlyRegistrationCount();
+    }
+    public function getNotifs() {
+        $session = new SessionsServices();
+        return $this->API->getNotification($session->get('UserID'));
+    }
+
+    public function getInformationToDashboard() : array {
+        $session = new SessionsServices();
+        $id = $session->get('UserID');
+        return $this->API->getInformationToDashboard($id);
     }
 
     public function searchData(): array {
@@ -2510,9 +2831,9 @@ class APIServices {
         $Conn = (new DBConnection())->getConnection();
         $q    = $_GET['q'] ?? '';
         $resulte = [];
-        $SQL1 = 'SELECT `Username` FROM users WHERE Username LIKE ?';
-        $SQL2 = 'SELECT `Name` FROM categories WHERE `Name` LIKE ?';
-        $SQL3 = 'SELECT `Item_name` FROM items WHERE `Item_name` LIKE ?';
+        $SQL1 = 'SELECT `Username`, `UserID` FROM users WHERE Username LIKE ?';
+        $SQL2 = 'SELECT `Name`, `ID` FROM categories WHERE `Name` LIKE ?';
+        $SQL3 = 'SELECT `Item_name`, `Item_id` FROM items WHERE `Item_name` LIKE ?';
 
         $stmt = $Conn->prepare($SQL1);
         $stmt->execute(["%{$q}%"]);
@@ -2719,6 +3040,40 @@ class ValidationService {
 
 
 ==================================================
+=== FILE: ./Services/CommentServices.php
+==================================================
+<?php
+
+    namespace Services;
+
+use Repositories\CommentRepository;
+
+    class CommentServices {
+
+        private CommentRepository $comment;
+
+        public function __construct()
+        {
+            $this->comment = new CommentRepository();
+        }
+
+        public function getLatestComments() {
+            return $this->comment->getLatestComments(5);
+        }
+    }
+
+
+
+
+
+
+
+
+
+?>
+
+
+==================================================
 === FILE: ./Services/SessionsServices.php
 ==================================================
 <?php
@@ -2731,6 +3086,108 @@ class ValidationService {
     class SessionsServices extends AbstractSessions implements ISessions {}
 
 ?>
+
+
+==================================================
+=== FILE: ./Controllers/CommentController.php
+==================================================
+<?php
+
+namespace Controllers;
+
+use Services\CommentServices;
+use Core\Helper\FlashMessage;
+use Views\Layouts\Head;
+use Core\Helper\URL;
+use Views\Layouts\Footer;
+
+class CommentController
+{
+    private CommentServices $commentService;
+
+    public function __construct()
+    {
+        $this->commentService = new CommentServices();
+    }
+
+    public function index()
+    {
+        $comments = $this->commentService->getLatestComments();
+
+        echo (new Head('Comments', ''))->Render();
+
+        include BASE_PATH . '/Views/Pages/Comments/Comments.php';
+
+        echo (new Footer('script', ''))->Render();
+    }
+
+public function edit($id) {
+    
+    $repo = new \Repositories\CommentRepository();
+    
+    $comment = $repo->findByItemId($id);
+
+    if (!$comment) {
+        FlashMessage::init();
+        FlashMessage::error('Comment not found');
+        URL::redirect('comments');
+    }
+
+    include BASE_PATH . '/Views/Pages/Comments/EditComment.php';
+}
+
+public function update($id) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $content = $_POST['comment'] ?? '';
+        $status = (int)($_POST['status'] ?? 0);
+        
+        $repo = new \Repositories\CommentRepository();
+        if ($repo->updateComment($id, $content, $status)) {
+            FlashMessage::init();
+             FlashMessage::success('Comment Updated Successfully');
+            } else {
+                FlashMessage::init();
+                FlashMessage::error('Failed to update comment');
+            }
+            URL::redirect('/comments/');
+    }
+}
+
+    // إضافة تعليق جديد (اختياري)
+    public function add()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $commentText = $_POST['comment'] ?? '';
+            $itemId = $_POST['item_id'] ?? null;
+            $userId = $_POST['user_id'] ?? null;
+
+            if (!empty($commentText) && $itemId && $userId) {
+                // هنا تستدعي Repository لإضافة التعليق
+                // مثال: $this->commentService->addComment($commentText, $itemId, $userId);
+
+                FlashMessage::success('success', 'Comment added successfully!');
+            } else {
+                FlashMessage::error('error', 'Please fill all fields.');
+            }
+
+            header('Location: /comments');
+            exit;
+        }
+
+        echo (new Head('Add Comment', ''))->Render();
+        echo '<main class="add-comment">';
+        echo '<h2>Add a Comment</h2>';
+        echo '<form method="POST" action="/comments/add">';
+        echo '<textarea name="comment" placeholder="Write your comment..."></textarea>';
+        echo '<input type="hidden" name="item_id" value="1">';
+        echo '<input type="hidden" name="user_id" value="1">';
+        echo '<button type="submit">Submit</button>';
+        echo '</form>';
+        echo '</main>';
+        echo (new Footer('script', ''))->Render();
+    }
+}
+
 
 
 ==================================================
@@ -2841,10 +3298,22 @@ class CategoriesController {
         $rows = $repo->showAllCategories('DESC');
 
         $repoItem = new ItemRepository();
-        $items = $repoItem->getItemFromCategories();
+        $items = $repoItem->
 
         include BASE_PATH . '/Views/Pages/Categories/ShowCategories.php';
     }
+
+    public function showItems($id) {
+
+    $itemRepo = new ItemRepository();
+    $categoryRepo = new CategoryRepository();
+    
+    $category = $categoryRepo->findById($id);
+
+    $items = $itemRepo->getItemsByCategoryId($id);
+
+    include BASE_PATH . '/Views/Pages/Categories/CategoryItems.php';
+}
 
     public function insert() {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -3171,6 +3640,8 @@ class ItemController {
         include BASE_PATH . '/Views/Pages/Items/AddItem.php';
     }
 
+    
+
     public function edit($id) {
         $repo = new ItemRepository();
         $row = $repo->findById($id);
@@ -3247,18 +3718,22 @@ class ItemController {
 namespace Controllers;
 
 use Services\APIServices;
+use Services\CommentServices;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
 
 class DashboardController {
     private APIServices $api;
+    private CommentServices $comments;
 
     public function __construct() {
         $this->api = new APIServices();
+        $this->comments = new CommentServices();
     }
 
     public function index() {
         echo (new Head('Dashboard', 'dashboard'))->Render();
+        $comments = $this->comments->getLatestComments();
         include BASE_PATH . '/Views/Pages/Main/Dashboard.php';
         echo (new Footer('script', 'chart.umd.min'))->Render();
     }
@@ -3271,6 +3746,9 @@ class DashboardController {
     public function getUsersWithDates(): void {
         $this->jsonResponse($this->api->getUsersWithDates());
     }
+    public function fetchNotifs() {
+       print_r($this->jsonResponse($this->api->getNotifs()));
+    }
 
     public function getCats(): void {
         $this->jsonResponse($this->api->getItemsCountWithCats());
@@ -3282,6 +3760,24 @@ class DashboardController {
 
     public function getCountryMade(): void {
         $this->jsonResponse($this->api->getCountryMade());
+    }
+
+     public function analiysRating(): void {
+        $this->jsonResponse($this->api->analiysRating());
+    }
+
+    public function analiysApprovedItems(): void {
+        $this->jsonResponse($this->api->analiysApprovedItems());
+    }
+
+     public function getTotalItemsInCats(): void {
+        $this->jsonResponse($this->api->getTotalItemsInCats());
+    }
+
+    public function getInformationToDashboard() : void {
+
+       $this->jsonResponse($this->api->getInformationToDashboard());
+
     }
 
     public function searchBox(): void {
@@ -3508,6 +4004,21 @@ use Stringable;
 
         }
 
+        public function getTotalItemsInCats() {
+
+            $SQL = 'SELECT c.Name AS Category, COUNT(i.Item_id) AS total_items
+                    FROM items i
+                    JOIN categories c ON i.Cat_ID = c.ID
+                    GROUP BY c.Name
+                    ORDER BY total_items DESC;
+                    ';
+
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
         
 
     }
@@ -3699,6 +4210,15 @@ class ItemRepository
 
         }
 
+        public function getItemsByCategoryId(int $catId): array {
+
+            $SQL = "SELECT * FROM items WHERE Cat_ID = ? ORDER BY Item_id DESC";
+            $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([$catId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+            
+}
+
         public function getCountryMadeAPI() : ?array {
 
             $SQL = "SELECT Country_Made, COUNT(*) AS ItemCount
@@ -3711,6 +4231,32 @@ class ItemRepository
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
 
+        }
+
+        public function analiysRating() : ?array {
+
+            $SQL = 'SELECT Rating, COUNT(*) AS total
+                    FROM items
+                    GROUP BY Rating
+                    ORDER BY Rating;
+                    ';
+
+             $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
+
+        public function analiysApprovedItems() {
+            $SQL = 'SELECT Approve, COUNT(*) AS total
+                    FROM items
+                    GROUP BY Approve;
+                    ';
+            $stmt = $this->pdo->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
         }
 
 
@@ -3955,6 +4501,101 @@ use Model\User;
 
 
 ==================================================
+=== FILE: ./Repositories/APIRepository.php
+==================================================
+<?php
+
+
+    namespace Repositories;
+
+use Core\Database\DBConnection;
+use PDO;
+use PDOException;
+
+    class APIRepository {
+
+        private PDO $pdo;
+
+        public function __construct()
+        {
+            $this->pdo = (new DBConnection())->getConnection();
+        }
+
+        public function getInformationToDashboard($id) : array {
+
+            $SQL = 'SELECT users.UserID,
+            users.UserName,
+            users.FullName,
+            users.Email,
+            users.Date_Reg,
+            users.Avatar,
+            COUNT(items.Item_id) AS All_Items
+            FROM users
+            INNER JOIN items ON users.UserID = items.Member_ID
+            WHERE users.UserID = ?
+            GROUP BY users.UserID, users.UserName, users.FullName, users.Email, users.Date_Reg, users.Avatar';
+
+            $stmt = $this->pdo->prepare($SQL);
+
+            if (!$stmt) {
+                return [];
+            }
+
+            if (!$stmt->execute([$id])) {
+                return [];
+            }
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // fetch returns false when no row; ensure we always return an array
+            return $result === false ? [] : $result;
+
+        }
+
+        public function getNotification($userId) : array {
+            $SQL = "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC";
+
+            try {
+                $stmt = $this->pdo->prepare($SQL);
+                $stmt->execute([$userId]);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                return [];
+            }
+
+        }
+
+        public function readMarkNotification($notificationId) : bool {
+
+           $stmt = $this->pdo->prepare("UPDATE notifications SET is_read = 1 WHERE id = ?");
+            return $stmt->execute([$notificationId]);
+
+        }
+
+        public function addNotification(int $userId, string $message, string $type = 'info') : bool {
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)"
+            );
+            return $stmt->execute([$userId, $message, $type]);
+        }
+
+
+        public function getUnreadCount(int $userId) : int {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+            $stmt->execute([$userId]);
+            return (int)$stmt->fetchColumn();
+        }
+
+        public function markAllAsRead(int $userId) : bool {
+            $stmt = $this->pdo->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?");
+            return $stmt->execute([$userId]);
+        }
+
+    }
+?>
+
+
+==================================================
 === FILE: ./Repositories/CommentRepository.php
 ==================================================
 <?php
@@ -3974,39 +4615,79 @@ use PDO;
             $this->pdo = ( new DBConnection() )->getConnection();
         }
 
-        public function findByItemId($id) : ?Comment {
-
-            $SQL = "
-                SELECT 
-                    items.Item_id AS itemId,
-                    items.Item_name,
-                    comments.c_id AS commentId,
-                    comments.comments,
-                    comments.status_com,
-                    comments.Added_date,
-                    comments.user_id
+        public function findByItemId(int $id) : ?Comment {
+                    $SQL = "
+                    SELECT 
+                        items.Item_id       AS itemId,
+                        items.Item_name     AS itemName,
+                        comments.c_id       AS commentId,
+                        comments.comments   AS commentText,
+                        comments.status_com AS status,
+                        comments.Added_date AS addedDate,
+                        comments.user_id    AS userId,
+                        users.Username      AS username
                     FROM items
+                    INNER JOIN comments ON items.Item_id = comments.item_id
+                    INNER JOIN users    ON users.UserID = comments.user_id
+                    WHERE comments.c_id = ?
+                    LIMIT 1
+
+                    ";
+
+                    $stmt = $this->pdo->prepare($SQL);
+                    $stmt->execute([$id]);
+                    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if (!$data) return null;
+
+                    return new Comment(
+                        (int)$data['commentId'],
+                        (string)$data['itemName'],
+                        (string)$data['commentText'],
+                        (int)$data['status'],
+                        (string)$data['addedDate'],
+                        (int)$data['itemId'],
+                        (int)$data['userId'],
+                        (string)$data['username']
+                    );
+}
+
+
+        public function getLatestComments($count) : array {
+
+                    $SQL = 'SELECT 
+                        users.Username AS UserName,
+                        users.UserID   AS User_ID,
+                        comments.comments AS CommentText,
+                        comments.Added_date AS CommentDate,
+                        comments.user_id AS CommentUserID,
+                        items.Member_ID AS ItemMemberID,
+                        comments.item_id AS CommentItemID,
+                        items.Item_name AS ItemName,
+                        comments.c_id AS CommentID,
+                        comments.status_com AS CommentStatus
+                    FROM users
                     INNER JOIN comments 
-                    ON items.Item_id = comments.item_id
-                WHERE comments.c_id = ?
-            ";
+                        ON users.UserID = comments.user_id
+                    INNER JOIN items 
+                        ON items.Item_id = comments.item_id
+                    LIMIT ' . $count;
 
+
+                     $stmt = $this->pdo->prepare($SQL);
+                    $stmt->execute();
+                    $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+                    return $data ?? [];
+
+        }
+
+        public function updateComment(int $id, string $content, int $status): bool {
+
+            $SQL = "UPDATE comments SET comments = ?, status_com = ? WHERE c_id = ?";
             $stmt = $this->pdo->prepare($SQL);
-            $stmt->execute([$id]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if(empty($data)) return null;
-
-            return new Comment(
-                (int)$data['commentId'],
-                (string)$data['comments'],
-                (int)$data['status_com'],
-                (string)$data['Added_date'],
-                (int)$data['itemId'],
-                (int)$data['user_id']
-                
-            );
-
+            return $stmt->execute([$content, $status, $id]);
+            
         }
 
     }

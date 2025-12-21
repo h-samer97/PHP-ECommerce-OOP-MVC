@@ -8,6 +8,7 @@ require_once __DIR__ . '/../Core/Router/Router.php';
 
 use Controllers\AuthController;
 use Controllers\CategoriesController;
+use Controllers\CommentController;
 use Controllers\DashboardController;
 use Controllers\ItemController;
 use Controllers\MembersController;
@@ -65,6 +66,33 @@ $router->add('members/{id}/delete', function($id) {
     $members->delete((int)$id);
 });
 
+// مسار لعرض العناصر داخل فئة محددة
+$router->add('categories/{id}/items', function($id) {
+    $categories = new CategoriesController();
+    $categories->showItems($id);
+});
+
+// مسارات تعديل التعليقات
+$router->add('comments/{id}/edit', function($id) {
+    $comments = new CommentController();
+    $comments->edit($id);
+});
+
+$router->add('comments/{id}/update', function($id) {
+    $comments = new CommentController();
+    $comments->update($id);
+});
+
+$router->add('comments', function() {
+    $comments = new CommentController();
+    $comments->index();
+});
+
+$router->add('comments/{id}/delete', function($id) {
+    $comments = new CommentController();
+    $comments->delete($id);
+});
+
 $router->add('members/pending', function() {
     $members = new MembersController();
     $members->getPendingUsers();
@@ -96,10 +124,46 @@ $router->add('api/getCats', function() {
 
 });
 
+$router->add('api/analiysRating', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->analiysRating();
+
+});
+
+$router->add('api/analiysApprovedItems', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->analiysApprovedItems();
+
+});
+
+
 $router->add('api/getCountryMade', function() {
 
     $dashboard = new DashboardController();
     $dashboard->getCountryMade();
+
+});
+
+$router->add('api/getTotalItemsInCats', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getTotalItemsInCats();
+
+});
+
+$router->add('api/getInformationToDashboard', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->getInformationToDashboard();
+
+});
+
+$router->add('api/getNotifs', function() {
+
+    $dashboard = new DashboardController();
+    $dashboard->fetchNotifs();
 
 });
 

@@ -18,35 +18,38 @@ FlashMessage::display();
 
 <main class="all-categories">
 
-    <?php 
-        foreach($rows as $row) {
-            echo '<div class="cat-section">';
-            echo '<h4>' . e($row['Name']) . '</h4>';
-            echo '<a href="categories/' . e($row['ID']) . '/edit">edit</a> 
-                  <a href="categories/' . e($row['ID']) . '/delete">delete</a>';
-            
-            echo '<div class="cat">';
-            
-            foreach($items as $item) {
-                if($row['ID'] == $item['ICI']) {
-                    echo '<div>' . e($item['Name']) . '</div>';
-                }
-            }
+    <?php foreach($rows as $row): ?>
+        <section class="cat-section">
+            <header class="cat-header">
+                <h4><?= e($row['Name']) ?></h4>
+                <nav class="cat-actions">
+                    <a href="categories/<?= e($row['ID']) ?>/edit" class="btn-edit">Edit</a>
+                    <a href="categories/<?= e($row['ID']) ?>/delete" class="btn-delete">Delete</a>
+                </nav>
+            </header>
 
-            echo '<p>' . e($row['Description']) . '</p>';
-            
-            echo '<div class="cat-config">';
-                echo e($row['Order']);
-                echo e($row['Visibility']);
-                echo e($row['Allow_Comment']);
-                echo e($row['Allow_Ads']);
-            echo '</div>';
+            <div class="cat-items">
+                <?php foreach($items as $item): ?>
+                    <?php if($row['ID'] == $item['ICI']): ?>
+                        <div class="cat-item"><?= e($item['Name']) ?></div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
 
-            echo '<a href="" class="cat-view">View</a>';
-            echo '</div>';
-        }      
-    ?>
-    </div>
+            <p class="cat-description"><?= e($row['Description']) ?></p>
+
+            <ul class="cat-config">
+                <li>Order: <?= e($row['Order']) ?></li>
+                <li>Visibility: <?= e($row['Visibility']) ?></li>
+                <li>Comments: <?= e($row['Allow_Comment']) ?></li>
+                <li>Ads: <?= e($row['Allow_Ads']) ?></li>
+            </ul>
+
+            <footer class="cat-footer">
+                <a href="categories/<?= e($row['ID']) ?>" class="cat-view">View</a>
+            </footer>
+        </section>
+    <?php endforeach; ?>
 
 </main>
 

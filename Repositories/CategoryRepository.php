@@ -118,6 +118,21 @@ use Stringable;
 
         }
 
+        public function getTotalItemsInCats() {
+
+            $SQL = 'SELECT c.Name AS Category, COUNT(i.Item_id) AS total_items
+                    FROM items i
+                    JOIN categories c ON i.Cat_ID = c.ID
+                    GROUP BY c.Name
+                    ORDER BY total_items DESC;
+                    ';
+
+            $stmt = $this->PDO->prepare($SQL);
+            $stmt->execute([]);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+
+        }
         
 
     }

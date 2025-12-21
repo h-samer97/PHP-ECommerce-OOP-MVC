@@ -3,18 +3,22 @@
 namespace Controllers;
 
 use Services\APIServices;
+use Services\CommentServices;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
 
 class DashboardController {
     private APIServices $api;
+    private CommentServices $comments;
 
     public function __construct() {
         $this->api = new APIServices();
+        $this->comments = new CommentServices();
     }
 
     public function index() {
         echo (new Head('Dashboard', 'dashboard'))->Render();
+        $comments = $this->comments->getLatestComments();
         include BASE_PATH . '/Views/Pages/Main/Dashboard.php';
         echo (new Footer('script', 'chart.umd.min'))->Render();
     }
@@ -27,6 +31,9 @@ class DashboardController {
     public function getUsersWithDates(): void {
         $this->jsonResponse($this->api->getUsersWithDates());
     }
+    public function fetchNotifs() {
+       print_r($this->jsonResponse($this->api->getNotifs()));
+    }
 
     public function getCats(): void {
         $this->jsonResponse($this->api->getItemsCountWithCats());
@@ -38,6 +45,24 @@ class DashboardController {
 
     public function getCountryMade(): void {
         $this->jsonResponse($this->api->getCountryMade());
+    }
+
+     public function analiysRating(): void {
+        $this->jsonResponse($this->api->analiysRating());
+    }
+
+    public function analiysApprovedItems(): void {
+        $this->jsonResponse($this->api->analiysApprovedItems());
+    }
+
+     public function getTotalItemsInCats(): void {
+        $this->jsonResponse($this->api->getTotalItemsInCats());
+    }
+
+    public function getInformationToDashboard() : void {
+
+       $this->jsonResponse($this->api->getInformationToDashboard());
+
     }
 
     public function searchBox(): void {

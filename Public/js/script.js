@@ -1,6 +1,6 @@
+"use strict";
 import API from "./chartsAPI.js";
-
-
+import Dashboard from "./Dashboard.js";
 
 class AppUI {
 
@@ -33,6 +33,7 @@ class AppUI {
         this.aside = document.querySelector('aside');
 
         this.api = new API();
+        this.dashboard = new Dashboard();
     }
 
     init() {
@@ -49,7 +50,15 @@ class AppUI {
         this.api.renderUsersDatesChart();
         this.api.searchBox();
         this.api.monthlyRegistrationCount();
-        // this.api.renderUsersDatesChart;
+        this.api.analiysRating();
+        this.api.analiysApprovedItems();
+        this.api.getTotalItemsInCats();
+
+        this.dashboard.getInformationToDashboard();
+
+        setTimeout(() => {
+            this.dashboard.fetchNotifications();
+        }, 2000);
     }
 
     toggleNavMenu() {

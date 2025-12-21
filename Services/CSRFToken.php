@@ -13,9 +13,9 @@
 
         public function ensureToken() : void {
 
-            if(session_status() !== PHP_SESSION_ACTIVE) {
-
-                session_start();
+                if (session_status() !== PHP_SESSION_ACTIVE) {
+                    session_start();
+                }
 
                 $expired = isset($_SESSION[$this->timeStampKey]) && 
                 ( time() - $_SESSION[$this->timeStampKey] > $this->ttlTime );
@@ -27,8 +27,6 @@
                 }
 
             }
-
-        }
 
         public function getToken() : mixed {
 

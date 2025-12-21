@@ -80,6 +80,8 @@ class ItemController {
         include BASE_PATH . '/Views/Pages/Items/AddItem.php';
     }
 
+    
+
     public function edit($id) {
         $repo = new ItemRepository();
         $row = $repo->findById($id);

@@ -25,10 +25,22 @@ class CategoriesController {
         $rows = $repo->showAllCategories('DESC');
 
         $repoItem = new ItemRepository();
-        $items = $repoItem->getItemFromCategories();
+        $items = $repoItem->
 
         include BASE_PATH . '/Views/Pages/Categories/ShowCategories.php';
     }
+
+    public function showItems($id) {
+
+    $itemRepo = new ItemRepository();
+    $categoryRepo = new CategoryRepository();
+    
+    $category = $categoryRepo->findById($id);
+
+    $items = $itemRepo->getItemsByCategoryId($id);
+
+    include BASE_PATH . '/Views/Pages/Categories/CategoryItems.php';
+}
 
     public function insert() {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {

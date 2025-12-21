@@ -5,7 +5,6 @@ use Core\Database\DBConnection;
 use Repositories\UserRepository;
 use Core\Helper\URL;
 
-// دالة مساعدة مختصرة للترميز الآمن
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
@@ -20,8 +19,8 @@ function e($string) {
             <div class="d-bar">
                 <input type="text" id="searchBox" placeholder="Search Here...">
                 <div class="sb-resultes"></div>
-                <button>
-                    <i class="fas fa-solid fa-bell"></i>
+                <button id="notifications">
+                    <i class="fas fa-solid fa-bell" id="btn-notifications"></i>
                 </button>
             </div>
 
@@ -38,7 +37,7 @@ function e($string) {
                 </div>
 
                  <div class="chart-box">
-                    <canvas id="categoryChart"></canvas>
+                    <canvas id="analiysRating"></canvas>
                 </div>
 
                 <div class="chart-box">
@@ -48,13 +47,12 @@ function e($string) {
 
             <div class="d-stats-info">
                 <div class="d-pie">
-                    <?php
-                        $repo = new UserRepository((new DBConnection())->getConnection());
-                        echo e($repo->sumCountAllUsers());
-                    ?>
+                   <canvas id="d-pie">
+                   </canvas>
                 </div>
                 <div class="d-line">
-                    charts
+                    <canvas id="d-line">
+                   </canvas>
                 </div>
             </div>
         </div>
@@ -63,39 +61,61 @@ function e($string) {
             <h3>My Profile</h3>
             <div class="d-profile">
                 <div class="d-profile-name">
-                    <img src="<?php echo e(URL::ico('editmembers')); ?>" alt="">
+                    <img src="" id="avatar">
                     <div class="d-txt">
-                        <h4><?php echo e($user->name ?? 'Guest'); ?></h4>
-                        <span><?php echo e($user->bio ?? 'No bio available'); ?></span>
-                        <div class="d-addr">
-                            <i class="fa fa-map-marker"></i> 
-                            <span><?php echo e($user->address ?? 'Unknown'); ?></span>
+                        Full Name: <h4 id="fullname"></h4>
+                        Username: <span id="username"></span>
+                        <div class="d-addr" id="address">
+                            <i class="fa fa-email"></i> 
+                            Email: <span id="email"></span>
                         </div>
                     </div>
                 </div>
                 <div class="d-profile-box">
                     <div>
-                        <span>lorem</span>
-                        <p><?php echo e($user->posts ?? 0); ?></p>
+                        <span>Regestar Date</span>
+                        <p id="dateReg"></p>
                     </div>
                     <div>
-                        <span>lorem</span>
-                        <p><?php echo e($user->comments ?? 0); ?></p>
-                    </div>
-                    <div>
-                        <span>lorem</span>
-                        <p><?php echo e($user->followers ?? 0); ?></p>
+                        <span>Items Total</span>
+                        <p id="itemsCount"></p>
                     </div>
                 </div>
             </div>
 
             <div class="d-commends">
                 <h3>Last 10 Commends</h3>
-                <div class="d-c-list">
-                    <?php foreach($comments as $comment): ?>
-                        <span><?php echo e($comment['text']); ?></span>
-                    <?php endforeach; ?>
-                </div>
+
+                <?php 
+                if (!empty($comments) && is_array($comments)) {
+                    foreach ($comments as $comment) {
+                        ?>
+                        <div class="d-c-list">
+
+                           <div class="d-c-img">
+                                <img src="<?php echo e($comment['avatar'] ?? URL::ico('user')); ?>" alt="">
+                           </div>
+
+                           <div class="d-c-comment">
+
+                            <div class="d-c-c-head">
+                                <h3><?php echo e($comment['Username'] ?? ''); ?></h3>
+                                <span class="d-c-date"><?php echo e($comment['Added_date'] ?? ''); ?></span>
+                            </div>
+
+                            <p class="d-c-cc">
+                                <?php echo e($comment['comments'] ?? ''); ?>
+                            </p>
+
+                           </div>
+                        </div>
+                        <?php
+                    }
+                } else {
+                    echo '<p>No comments found.</p>';
+                }
+                ?>
+
             </div>
         </div>
     </section>
