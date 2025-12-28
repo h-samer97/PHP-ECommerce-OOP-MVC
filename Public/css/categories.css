@@ -1,13 +1,118 @@
-/* Public/css/category-items.css */
-.category-items-container { padding: 20px; direction: rtl; }
-.category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-.item-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.item-img { height: 180px; background: #f4f4f4; position: relative; }
-.item-img img { width: 100%; height: 100%; object-fit: cover; }
-.item-price { position: absolute; top: 10px; left: 10px; background: #27ae60; color: #fff; padding: 2px 10px; border-radius: 4px; }
-.item-content { padding: 15px; }
-.item-content h3 { margin: 0 0 10px; font-size: 18px; color: #333; }
-.item-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
-.btn-edit-link { color: #3498db; text-decoration: none; font-weight: bold; }
-.btn-edit-link:hover { text-decoration: underline; }
+/* ====== الأساسيات ====== */
+body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: #f9f9fb;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* ====== الحاوية الرئيسية ====== */
+.all-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    margin-left: 150px; 
+    padding: 20px;
+    transition: all var(--main-transition);
+}
+
+/* ====== بطاقة القسم ====== */
+.cat-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cat-section:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* ====== العنوان والإجراءات ====== */
+.cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.cat-header h4 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* أزرار الإجراءات (Edit / Delete / View) */
+.cat-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+.cat-actions a {
+    text-decoration: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background 0.2s ease;
+    color: #fff;
+}
+
+/* زر Edit */
+.btn-edit {
+    background: #3498db;
+}
+.btn-edit:hover {
+    background: #2980b9;
+}
+
+/* زر Delete */
+.btn-delete {
+    background: #e74c3c;
+}
+.btn-delete:hover {
+    background: #c0392b;
+}
+
+/* زر View */
+.btn-view {
+    background: #2ecc71;
+}
+.btn-view:hover {
+    background: #27ae60;
+}
+
+/* ====== العناصر داخل القسم ====== */
+.cat-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.cat-item {
+    background: #ecf0f1;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #2c3e50;
+}
+
+/* ====== الوصف ====== */
+.cat-description {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+/* ====== الإعدادات ====== */
+.cat-config {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+.cat-config li {
+    font-size: 0.85rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #eee;
+}

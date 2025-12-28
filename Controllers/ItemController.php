@@ -12,14 +12,26 @@ use Services\CSRFToken;
 
 class ItemController {
 
+    private SessionsServices $session;
+
     public function __construct()
     {
-        new SessionsServices();
+        $this->session = new SessionsServices();
+            if(!$this->session->checkIfExist()) {
+                URL::redirect('login');
+                return;
+            }
     }
 
     public function index() {
-        echo 'show Items';
-    }
+
+    $repo = new ItemRepository();
+
+    $items = $repo->getItemsByCategoryId(1);
+
+    include BASE_PATH . '/Views/Pages/Items/ItemsByCategory.php';
+}
+
 
     private function getItemDataFromPost(): array
     {
@@ -48,7 +60,7 @@ class ItemController {
                 if (empty($_POST[$req])) {
                     FlashMessage::init();
                     FlashMessage::error('Please fill all fields');
-                    URL::redirect('items/add');
+                    URL::redirect('items');
                     return;
                 }
             }
@@ -58,7 +70,7 @@ class ItemController {
             if ($data['price'] < 0) {
                 FlashMessage::init();
                 FlashMessage::error('Invalid price');
-                URL::redirect('items/add');
+                URL::redirect('items/insert');
                 return;
             }
 
@@ -73,7 +85,7 @@ class ItemController {
                 URL::redirect('items');
             } else {
                 FlashMessage::error('Failed to insert item');
-                URL::redirect('items/add');
+                URL::redirect('items');
             }
         }
 
@@ -124,10 +136,13 @@ class ItemController {
 
             FlashMessage::init();
             if ($status) {
+                FlashMessage::init();
                 FlashMessage::success('Item updated successfully!');
-                URL::redirect('items/manage');
+                URL::redirect('items');
             } else {
+                FlashMessage::init();
                 FlashMessage::error('Failed to update item');
+                URL::redirect('items');
             }
         }
     }

@@ -19,8 +19,14 @@ class AuthController {
 
     public function __construct(AuthLogin $login = null)
     {
-        $this->auth = $login ?? new AuthLogin((new UserRepository((new DBConnection())->getConnection())));
         $this->session = new SessionsServices();
+        if(!$this->session->checkIfExist()) {
+            URL::redirect('login');
+            return;
+        }
+        $this->auth = $login ?? new AuthLogin((new UserRepository((new DBConnection())->getConnection())));
+
+
     }
 
     public function renderLoginView(string $message = '', string $type = 'info') {

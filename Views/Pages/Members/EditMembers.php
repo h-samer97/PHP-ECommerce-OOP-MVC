@@ -7,7 +7,7 @@ use Views\Layouts\Head;
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
-echo ( new Head('Edit Member', 'edit') )->Render();
+echo ( new Head('Edit Member', 'editmembers') )->Render();
 ?>
 <form class="edit-form" method="POST" action="<?php echo BASE_URL . 'members/update'; ?>">
     <h2><i class="fa fa-user-edit"></i> Edit Member</h2>

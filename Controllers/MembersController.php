@@ -14,9 +14,17 @@ class MembersController {
 
     private MemberService $Service;
     private UserRepository $repo;
+    private SessionsServices $session;
 
     public function __construct()
     {
+
+        $this->session = new SessionsServices();
+            if(!$this->session->checkIfExist()) {
+                URL::redirect('login');
+                return;
+            }
+
         $this->Service = new MemberService();
         $this->repo = new UserRepository((new DBConnection())->getConnection());
     }

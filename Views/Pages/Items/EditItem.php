@@ -5,16 +5,15 @@ use Views\Layouts\Head;
 use Core\Helper\FlashMessage;
 use Services\CSRFToken;
 
-// دالة مساعدة مختصرة للترميز الآمن
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 
-echo (new Head('Add Category', 'addMember'))->Render();
+echo (new Head('Edit Item', 'item'))->Render();
 
 FlashMessage::init();
 FlashMessage::display();
-
+include BASE_PATH . '/Views/Layouts/Sidebar.php';
 ?>
 <div class="form-card">
   <h2><i class="fas fa-plus-circle"></i> Add New Item</h2>

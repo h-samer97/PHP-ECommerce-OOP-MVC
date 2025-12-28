@@ -12,9 +12,15 @@ use Exception;
 
 class CategoriesController {
 
+    private SessionsServices $session;
+
     public function __construct()
     {
-            new SessionsServices();
+           $this->session = new SessionsServices();
+            if(!$this->session->checkIfExist()) {
+                URL::redirect('login');
+                return;
+            }
     }
 
     public function index() {
@@ -25,10 +31,11 @@ class CategoriesController {
         $rows = $repo->showAllCategories('DESC');
 
         $repoItem = new ItemRepository();
-        $items = $repoItem->
+        $items = [];
 
-        include BASE_PATH . '/Views/Pages/Categories/ShowCategories.php';
+        include \BASE_PATH . '/Views/Pages/Categories/ShowCategories.php';
     }
+    
 
     public function showItems($id) {
 
@@ -39,7 +46,7 @@ class CategoriesController {
 
     $items = $itemRepo->getItemsByCategoryId($id);
 
-    include BASE_PATH . '/Views/Pages/Categories/CategoryItems.php';
+    include \BASE_PATH . '/Views/Pages/Categories/CategoryItems.php';
 }
 
     public function insert() {
@@ -73,7 +80,7 @@ class CategoriesController {
         }
     }
 
-    include BASE_PATH . '/Views/Pages/Categories/AddCategory.php';
+    include \BASE_PATH . '/Views/Pages/Categories/AddCategory.php';
 }
 
 
@@ -82,7 +89,7 @@ class CategoriesController {
         $repo = new CategoryRepository();
         $rows = $repo->findById($id);
 
-        include BASE_PATH . '/Views/Pages/Categories/EditCategory.php';
+        include \BASE_PATH . '/Views/Pages/Categories/EditCategory.php';
 
     }
 
@@ -106,6 +113,9 @@ class CategoriesController {
                     FlashMessage::warning('This Category Already Exists');
                 } else {
                     $repo->update($_POST);
+                    FlashMessage::init();
+                    FlashMessage::success('Update Successfully');
+                    URL::redirect('categories');
                 }
         }
     }

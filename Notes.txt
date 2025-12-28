@@ -1,3 +1,0 @@
-[4] => Authorization in pages like dashboard
-[6] => binary Search
-[7] => dashboard

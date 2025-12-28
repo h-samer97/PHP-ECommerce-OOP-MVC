@@ -4,14 +4,24 @@ namespace Controllers;
 
 use Services\APIServices;
 use Services\CommentServices;
+use Services\SessionsServices;
 use Views\Layouts\Footer;
 use Views\Layouts\Head;
+use Core\Helper\URL;
 
 class DashboardController {
     private APIServices $api;
     private CommentServices $comments;
+    private SessionsServices $session;
 
     public function __construct() {
+
+        $this->session = new SessionsServices();
+        if(!$this->session->checkIfExist()) {
+            URL::redirect('login');
+            return;
+        }
+
         $this->api = new APIServices();
         $this->comments = new CommentServices();
     }

@@ -28,7 +28,7 @@ use Services\LanguageLoader;
                 <div class="container">
                     <ul class='mnb-list'>
                         <li>
-                            <a href="">{$this->language::getKeyword('home')}</a>
+                            <a href="dashboard">{$this->language::getKeyword('dashboard')}</a>
                         </li>
 
                         <li>
@@ -36,19 +36,15 @@ use Services\LanguageLoader;
                         </li>
 
                         <li>
-                            <a href="">{$this->language::getKeyword('members')}</a>
+                            <a href="members">{$this->language::getKeyword('members')}</a>
                         </li>
 
                         <li>
-                            <a href="">{$this->language::getKeyword('item')}</a>
+                            <a href="items">{$this->language::getKeyword('items')}</a>
                         </li>
 
                         <li>
-                            <a href="">{$this->language::getKeyword('logs')}</a>
-                        </li>
-
-                        <li>
-                            <a href="">{$this->language::getKeyword('statistics')}</a>
+                            <a href="comments">{$this->language::getKeyword('comments')}</a>
                         </li>
 
                     </ul>

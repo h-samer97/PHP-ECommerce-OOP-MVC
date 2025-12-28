@@ -12,7 +12,7 @@ abstract class AbstractSessions implements ISessions {
         $name     = 'ecomm';
         $lifetime = 0;
         $path     = '/';
-        $secure   = false; // غيّرها إلى true في HTTPS
+        $secure   = false;
         $httpOnly = true;
 
         if (session_status() === PHP_SESSION_ACTIVE) {

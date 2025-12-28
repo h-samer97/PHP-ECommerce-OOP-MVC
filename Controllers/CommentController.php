@@ -8,6 +8,7 @@ use Views\Layouts\Head;
 use Core\Helper\URL;
 use PDOException;
 use Repositories\CommentRepository;
+use Services\SessionsServices;
 use Soap\Url as SoapUrl;
 use Views\Layouts\Footer;
 
@@ -15,9 +16,15 @@ class CommentController
 {
     private CommentServices $commentService;
     private CommentRepository $repo;
+    private SessionsServices $session;
 
     public function __construct()
     {
+        $this->session = new SessionsServices();
+        if(!$this->session->checkIfExist()) {
+            URL::redirect('login');
+            return;
+        }
         $this->commentService = new CommentServices();
         $this->repo = new CommentRepository();
     }

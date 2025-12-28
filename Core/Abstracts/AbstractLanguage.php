@@ -1,46 +1,37 @@
 <?php
 
-    namespace Core\Abstracts;
+namespace Core\Abstracts;
 
-    use Exception;
+use Exception;
 
-    abstract class AbstractLanguage {
+abstract class AbstractLanguage {
 
-        protected static array $language = [];
+    private static array $language = [];
 
-
-        public static function getKeyword($key) : string {
-
-            return self::$language[$key] ?? 'def';
-
+    public static function getKeyword($key) : string {
+        
+        if (empty(self::$language)) {
+            self::loadDefaultLanguage();
         }
 
-        public function __construct(string $file = 'en') {
-
-            $langFilePath = BASE_PATH . '/Language/' . $file . '.php';
-
-            if(file_exists($langFilePath)) {
-
-                $translations = include $langFilePath;
-
-                    if(is_array($translations)) {
-
-                        self::$language = $translations;
-
-                    } else {
-
-                        throw new Exception('The language file does not contain a valid array !');
-
-                    }
-
-            } else {
-
-                        throw new Exception('The Language File does NOT Exist');
-
-            }
-
-        }
-
+        return self::$language[$key] ?? $key; 
     }
 
-?>
+    private static function loadDefaultLanguage() {
+
+        $file = $_COOKIE['lang'] ?? 'ar'; 
+        $langFilePath = BASE_PATH . '/Language/' . $file . '.php';
+
+        if(file_exists($langFilePath)) {
+            $translations = include $langFilePath;
+            if(is_array($translations)) {
+                self::$language = $translations;
+            }
+        }
+    }
+
+    public function __construct(string $file = null) {
+        $file = $file ?? $_COOKIE['lang'] ?? 'ar';
+        self::loadDefaultLanguage();
+    }
+}

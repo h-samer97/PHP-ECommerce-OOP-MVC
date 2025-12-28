@@ -10,7 +10,7 @@ function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 
-echo (new Head('Add Category', 'addMember'))->Render();
+echo (new Head('Edit Category', 'edit-category'))->Render();
 
 FlashMessage::init();
 FlashMessage::display();

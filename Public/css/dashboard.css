@@ -243,6 +243,11 @@
   cursor: pointer;
   border-radius: 8px;
 }
+.sb-resultes div a {
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+}
 .sb-resultes div:hover {
   background-color: var(--main-light-blue);
 }
@@ -262,48 +267,69 @@ canvas {
   border-radius: 6px;
   padding: 4px 8px;
 }
-#notifications #btn-notifications + div  {
+#notifications #btn-notifications + div {
   display: none;
 }
+
 #notifications #btn-notifications + div.notif-show {
-	position: fixed;
-	z-index: 99;
-	top: 140px;
-	left: 255px;
-	background-color: var(--main-light-blue);
-	color: white;
-	display: flex;
-	flex-direction: column;
-	width: 700px;
-	text-align: left;
-	gap: 18px;
-	font-size: 18px;
-	border: 1px solid var(--muted);
-	border-radius: 12px;
-	transition: all .5s;
-  animation: show-notif .3s ease-in-out;
+  position: fixed;
+  z-index: 99;
+  top: 140px;
+  left: 255px;
+  background-color: #1e2a38; /* لون داكن أنيق */
+  color: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+  width: 700px;
+  text-align: left;
+  gap: 12px;
+  font-size: 17px;
+  border: 1px solid #3c4a5a;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.5s ease;
+  animation: show-notif 0.3s ease-in-out;
+  padding: 20px;
 }
+
 .n-item {
-  border: 1px solid #333;
-  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #444;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: #2a3b4d;
+  transition: background-color 0.3s;
 }
+
+.n-item:hover {
+  background-color: #3b4f66;
+}
+
+.n-item i {
+  font-size: 20px;
+  color: #00bcd4;
+}
+
 .notif-show::before {
-	content: '';
-	position: absolute;
-	top: -30px;
-	right: 2px;
-	border-color: transparent transparent var(--main-light-blue) transparent;
-	border-width: 18px;
-	border-style: solid;
-	z-index: 10;
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: 20px;
+  border-color: transparent transparent #1e2a38 transparent;
+  border-width: 18px;
+  border-style: solid;
+  z-index: 10;
 }
+
 @keyframes show-notif {
   0% {
-    display: none;
+    transform: translateY(-10px);
     opacity: 0;
   }
   100% {
-    display: flex;
+    transform: translateY(0);
     opacity: 1;
   }
 }

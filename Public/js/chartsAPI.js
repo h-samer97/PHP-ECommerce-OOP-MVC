@@ -1,13 +1,10 @@
 export default class API {
 
-    constructor() {
-        const x = this.binarySearch([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 4);
-        console.log("Binary search result:", x);
-    }
+    constructor() {}
 
     analiysRating() {
 
-        fetch('/api/analiysRating').then(res => res.json())
+        fetch('api/analiysRating').then(res => res.json())
         .then(rows => {
             const labels = rows.map(r => r.Rating);
             const data = rows.map(r => r.total);
@@ -56,7 +53,7 @@ export default class API {
     }
 
     renderUsersDatesChart() {
-        fetch('/api/getUsersWithDates')
+        fetch('api/getUsersWithDates')
             .then(res => res.json())
             .then(rows => {
                 const labels = rows.map(r => r.year);
@@ -109,15 +106,13 @@ export default class API {
         if (!canvas) return console.error("Canvas #monthlyChart not found");
         const ctx = canvas.getContext('2d');
 
-        fetch('/api/monthlyRegistrationCount')
+        fetch('api/monthlyRegistrationCount')
             .then(res => res.json())
             .then(data => {
                 
                 const chartData = new Array(12).fill(0);
 
-                // توزيع البيانات القادمة من السيرفر على المصفوفة (شهر 1 -> فهرس 0)
                 data.forEach(row => {
-                    // التحقق للتأكد من وجود البيانات
                     if (row.month && row.registrations) {
                         chartData[row.month - 1] = row.registrations;
                     }
@@ -129,13 +124,11 @@ export default class API {
                         labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
                         datasets: [{
                             label: 'User Registrations',
-                            data: chartData, // <--- استخدام المصفوفة المصححة
-                            // backgroundColor: 'rgba(75,192,192,0.6)',
-                            // borderColor: '#4bc0c0',
+                            data: chartData,
                             borderWidth: 1
                         }]
                     },
-                    options: { // خيارات محسنة لتحسين شكل الرسم
+                    options: { 
                         responsive: true,
                         animation: { duration: 1000, easing: 'easeOutQuart' },
                         plugins: {
@@ -168,7 +161,7 @@ export default class API {
 
             if (query.length > 2) {
                 Timer = setTimeout(() => {
-                    fetch('/api/searchData?q=' + encodeURIComponent(query))
+                    fetch('api/searchData?q=' + encodeURIComponent(query))
                         .then(res => res.json())
                         .then(data => {
                             searchBoxFieldItem.innerHTML = '';
@@ -229,6 +222,8 @@ export default class API {
         });
     }
 
+    // دالة البحث الثنائي
+    // هذه الدالة تجريبية قد يتم تفعيلها على مربع البحث لاحقا
     binarySearch(array, target) {
         let first = 0;
         let last = array.length - 1;
@@ -306,7 +301,7 @@ export default class API {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Analiys Rating',
+                        label: 'Get Total Items In Cats',
                         data: data,
                          borderWidth: 2,
                         // fill: true,
@@ -319,7 +314,7 @@ export default class API {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Data Analiys Rating',
+                                text: 'Get Total Items In Cats',
                                 // font: { size: 18, weight: 'bold' },
                                 color: '#000000ff',
                                 padding: { bottom: 10 }

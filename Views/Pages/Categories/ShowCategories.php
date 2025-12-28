@@ -4,15 +4,16 @@ use Views\Layouts\Footer;
 use Views\Layouts\Head;
 use Core\Helper\FlashMessage;
 
-// دالة مساعدة مختصرة
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 
-echo ( new Head('Categories', '') )->Render();
+echo ( new Head('Categories', 'category') )->Render();
 
 FlashMessage::init();
 FlashMessage::display();
+
+include BASE_PATH . '/Views/Layouts/Sidebar.php';
 
 ?>
 
@@ -24,7 +25,7 @@ FlashMessage::display();
                 <h4><?= e($row['Name']) ?></h4>
                 <nav class="cat-actions">
                     <a href="categories/<?= e($row['ID']) ?>/edit" class="btn-edit">Edit</a>
-                    <a href="categories/<?= e($row['ID']) ?>/delete" class="btn-delete">Delete</a>
+                    <a href="categories/<?= e($row['ID']) ?>/delete" class="btn-delete" onclick="confirm('Are You Sure?')">Delete</a>
                 </nav>
             </header>
 
@@ -44,10 +45,6 @@ FlashMessage::display();
                 <li>Comments: <?= e($row['Allow_Comment']) ?></li>
                 <li>Ads: <?= e($row['Allow_Ads']) ?></li>
             </ul>
-
-            <footer class="cat-footer">
-                <a href="categories/<?= e($row['ID']) ?>" class="cat-view">View</a>
-            </footer>
         </section>
     <?php endforeach; ?>
 

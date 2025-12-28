@@ -45,18 +45,12 @@ $router->add('dashboard', function() {
     $DSH->index();
 });
 
-/**
- * عرض قائمة الأعضاء
- */
+
 $router->add('members', function() {
     $members = new MembersController();
     $members->index();
 });
 
-/**
- * تعديل عضو محدد عبر البارامتر {id}
- * مثال: /members/15/edit
- */
 $router->add('members/{id}/edit', function($id) {
     $members = new MembersController();
     $members->edit((int)$id);
@@ -66,13 +60,11 @@ $router->add('members/{id}/delete', function($id) {
     $members->delete((int)$id);
 });
 
-// مسار لعرض العناصر داخل فئة محددة
 $router->add('categories/{id}/items', function($id) {
     $categories = new CategoriesController();
     $categories->showItems($id);
 });
 
-// مسارات تعديل التعليقات
 $router->add('comments/{id}/edit', function($id) {
     $comments = new CommentController();
     $comments->edit($id);
@@ -192,6 +184,11 @@ $router->add('categories', function() {
     $categories->index();
 });
 
+$router->add('categories/{id}', function($id) {
+    $categories = new CategoriesController();
+    $categories->index();
+});
+
 $router->add('categories/add', function() {
     $categories = new CategoriesController();
     $categories->insert();
@@ -232,7 +229,7 @@ $router->add('items/{id}/delete', function($id) {
     $item->delete($id);
 });
 
-$router->add('items/manage', function($id) {
+$router->add('items', function() {
     $item = new ItemController();
     $item->index();
 });

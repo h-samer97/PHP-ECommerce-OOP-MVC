@@ -7,7 +7,7 @@ echo (new Head('Comments Management', 'comments'))->Render();
 
 FlashMessage::init();
 FlashMessage::display();
-
+include BASE_PATH . '/Views/Layouts/Sidebar.php';
 ?>
 
 <div class="comments-container-wrapper">

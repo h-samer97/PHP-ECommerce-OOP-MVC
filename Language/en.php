@@ -7,12 +7,14 @@
         'home' => 'home',
         'categories' => 'categories',
         'members' => 'members',
-        'item' => 'item',
+        'items' => 'items',
         'logs' => 'logs',
         'statistics' => 'statistics',
         'logout' => 'logout',
         'editmember' => 'Member Edit',
         'settings' => 'settings',
+        'dashboard' => 'dashboard',
+        'comments' => 'comments'
     ];
 
 

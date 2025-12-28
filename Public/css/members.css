@@ -2,12 +2,14 @@
 /* Members Page  */
 .edit-form {
   background: #fff;
-  padding: 30px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
   width: 350px;
   animation: fadeIn 0.6s ease-in-out;
   margin: 20px auto;
+  margin-left: 150px;
+   padding: 20px;
+    transition: all var(--main-transition);
 }
 
 .edit-form h2 {

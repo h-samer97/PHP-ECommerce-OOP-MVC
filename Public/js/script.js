@@ -45,7 +45,7 @@ class AppUI {
         this.togglePlaceholder(this.passwordInput);
         this.confirmDelete();
         this.showLoaderOnLoad();
-        // this.toggleSideBarStatus();
+        this.toggleSideBarStatus();
         // this.api.renderCatsAPI();
         this.api.renderUsersDatesChart();
         this.api.searchBox();
@@ -82,11 +82,16 @@ class AppUI {
     }
 
     toggleSideBarStatus() {
+        
+        if(this.burgerSideBar != undefined || this.burgerSideBar != null) {
+
         this.burgerSideBar.addEventListener('click', () => {
 
             this.aside.classList.toggle('hide');
 
         });
+        }
+
     }
 
     dashboardToggle() {

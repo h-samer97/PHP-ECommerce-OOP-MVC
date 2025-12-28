@@ -1,9 +1,9 @@
-
 @import url('dashboard.css');
 @import url('members.css');
 @import url('navbar.css');
 @import url('comments.css');
 @import url('categories.css');
+@import url('items.css');
 * {
 
     padding: 0;
@@ -313,6 +313,9 @@ ul.even li:nth-child(even){
     max-width: 80%;
     margin: 10px auto;
     text-align: center;
+    margin-left: 150px;
+    padding: 20px;
+    transition: all var(--main-transition);
 }
 .active {
     color: var(--main-color-dark-sec);
@@ -567,12 +570,18 @@ aside {
   max-width: 150px;
   background-color: var(--main-dark-blue);
   color: white;
-  height: 626px;
+  height: 100vh;
+  position: fixed;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  font-size: 14px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
   transition: all var(--main-transition);
+  text-transform: capitalize;
 }
 aside i {
   cursor: pointer;
@@ -584,9 +593,9 @@ aside.hide {
 aside.hide span {
   display: none;
 }
-aside.hide ul li a span {
+/* aside.hide ul li a span {
   display: none;
-}
+} */
 /* aside span {
   display: block;
 } */
