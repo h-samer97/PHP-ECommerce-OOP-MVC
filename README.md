@@ -5,30 +5,30 @@ A robust eCommerce Content Management System (CMS) built with **Native PHP 8** u
 ## 🚀 Features
 
 ### Core Architecture
-* [cite_start]**Custom MVC Framework:** Full separation of concerns with a custom directory structure (Controllers, Models, Views, Repositories)[cite: 126].
-* [cite_start]**Regex-Based Routing:** A custom `Router` class that handles dynamic URLs and parameters (e.g., `members/{id}/edit`)[cite: 128].
-* [cite_start]**Repository Pattern:** Database logic is abstracted into repositories (e.g., `UserRepository`, `ItemRepository`) to maintain clean controller code[cite: 159, 241].
-* [cite_start]**Dependency Injection:** Services and repositories are injected into controllers[cite: 186].
+* [cite_start]**Custom MVC Framework:** Full separation of concerns with a custom directory structure (Controllers, Models, Views, Repositories)
+* [cite_start]**Regex-Based Routing:** A custom `Router` class that handles dynamic URLs and parameters (e.g., `members/{id}/edit`)
+* [cite_start]**Repository Pattern:** Database logic is abstracted into repositories (e.g., `UserRepository`, `ItemRepository`) to maintain clean controller code
+* [cite_start]**Dependency Injection:** Services and repositories are injected into controllers
 
 ### 🛡️ Security
-* [cite_start]**CSRF Protection:** Built-in middleware (`VerifyCsrfToken`) and token generation services to prevent Cross-Site Request Forgery[cite: 111, 152].
-* [cite_start]**Secure Authentication:** Session-based login system with password hashing[cite: 163, 175].
-* [cite_start]**Input Sanitization:** Global helper functions (e.g., `e()`) to prevent XSS attacks[cite: 42].
-* [cite_start]**PDO Prepared Statements:** All database queries use prepared statements to prevent SQL injection[cite: 115].
+* [cite_start]**CSRF Protection:** Built-in middleware (`VerifyCsrfToken`) and token generation services to prevent Cross-Site Request Forgery
+* [cite_start]**Secure Authentication:** Session-based login system with password hashing
+* [cite_start]**Input Sanitization:** Global helper functions (e.g., `e()`) to prevent XSS attacks
+* [cite_start]**PDO Prepared Statements:** All database queries use prepared statements to prevent SQL injection
 
 ### 📊 Dashboard & Analytics
-* [cite_start]**Real-Time Visualization:** Interactive charts powered by **Chart.js** and fed by an internal API[cite: 203, 1425].
+* [cite_start]**Real-Time Visualization:** Interactive charts powered by **Chart.js** and fed by an internal API
 * **Analytics:**
-    * [cite_start]User registration trends (Yearly/Monthly)[cite: 1435].
-    * [cite_start]Item rating analysis[cite: 1426].
-    * [cite_start]Category distribution stats[cite: 1477].
-* [cite_start]**Notification System:** Asynchronous notification fetching via API[cite: 1526].
+    * [cite_start]User registration trends (Yearly/Monthly
+    * [cite_start]Item rating analysis
+    * [cite_start]Category distribution stats
+* [cite_start]**Notification System:** Asynchronous notification fetching via API
 
 ### 📦 Management Modules
-* [cite_start]**User Management:** Add, edit, delete, and approve pending members[cite: 187, 189].
-* [cite_start]**Items (Products):** Full CRUD for products with support for ratings, status (New/Used), and country of origin[cite: 193].
-* [cite_start]**Categories:** hierarchical category management with visibility and ad settings[cite: 180].
-* [cite_start]**Comments:** Moderation system to approve or delete user comments[cite: 170].
+* [cite_start]**User Management:** Add, edit, delete, and approve pending members
+* [cite_start]**Items (Products):** Full CRUD for products with support for ratings, status (New/Used), and country of origin
+* [cite_start]**Categories:** hierarchical category management with visibility and ad settings
+* [cite_start]**Comments:** Moderation system to approve or delete user comments
 
 ## 🛠️ Technology Stack
 * **Backend:** PHP 8+
@@ -40,7 +40,7 @@ A robust eCommerce Content Management System (CMS) built with **Native PHP 8** u
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/yourusername/ecomm-mvc.git](https://github.com/yourusername/ecomm-mvc.git)
+    git clone https://github.com/h-samer97/PHP-ECommerce-OOP-MVC
     ```
 
 2.  **Database Setup**
